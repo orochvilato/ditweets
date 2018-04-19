@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from functools import wraps
-from flask import g, request, redirect, url_for, make_response, session, Response
+from flask import g, request, redirect, url_for, make_response, session, Response, render_template
+from flask.views import View
 import sys
 import json
 import os
 
 def AUTH(app,path=''):
-    app.add_url_rule(path+'/login',view_func=loginview)
+    app.add_url_rule(path+'/login',view_func=LoginView.as_view('login'))
     app.add_url_rule(path+'/logout',view_func=logoutview)
     app.add_url_rule(path+'/logged',view_func=loggedview)
     app.add_url_rule(path+'/reset_password',view_func=reset_passwordview)
@@ -37,15 +38,19 @@ def reset_passwordview():
         return uid
 
 
-def loginview():
-    user = request.args.get('username')
-    password = request.args.get('password')
-    import json
-    if auth.authenticate(user,password):
-        session['id'] = {'username':user,'password':password}
-        return json.dumps({'username':user})
-    else:
-        return json.dumps({}), 401
+class LoginView(View):
+    methods = ['GET','POST']
+    def dispatch_request(self):
+        print(request.form,request.method)
+        user = request.form.get('username')
+        password = request.form.get('password')
+        rdir = request.form.get('redirect')
+        import json
+        if auth.authenticate(user,password):
+            session['id'] = {'username':user,'password':password}
+            return json.dumps({'username':user})
+        else:
+            return redirect(url_for(rdir))
 
 def logoutview():
     if 'id' in session:
@@ -56,9 +61,7 @@ def loggedview():
     import json
     if 'id' in session:
         #return json.dumps(roles)
-        print(session['id']['username'])
         data = auth.get_data(session['id']['username'])
-        print(data)
         data['count'] = data.get('count',0) + 1
         auth.update_data(session['id']['username'],data)
         ret = {'username':session['id']['username'],'data':data}
@@ -67,13 +70,15 @@ def loggedview():
         return json.dumps({})
 
 
-def require_login(f):
-    @wraps(f)
-    def decorated_function(*args,**kwargs):
-        if 'id' in session:
-            return f(*args,**kwargs)
-        return "nope",401
-    return decorated_function
+def require_login(redirect):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args,**kwargs):
+            if 'id' in session:
+                return f(*args,**kwargs)
+            return render_template("login.html",redirect=redirect)
+        return decorated_function
+    return decorator
 
 def require_basicauth(f):
     @wraps(f)

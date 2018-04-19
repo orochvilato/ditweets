@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+  </head>
+  <body class="layout-default">
+  <section class="hero is-fullheight is-medium is-primary is-bold">
+        <div class="hero-body">
+          <div class="container has-text-centered">
+              <div class="column is-4 is-offset-4">
+              <div class="box">
+                     <form action="login" method="post">
+                       <input type="hidden" name="redirect" value="{{redirect}}">
+                       <div class="field">
+                         <div class="control">
+                           <input name="username" class="input is-medium" type="text" placeholder="Utilisateur" autofocus="">
+                         </div>
+                       </div>
+
+                       <div class="field">
+                         <div class="control">
+                           <input name="password" class="input is-medium" type="password" placeholder="Mot de passe">
+                         </div>
+                       </div>
+
+                       <input type="submit" class="button is-block is-primary is-medium is-fullwidth" value="Login">
+                     </form>
+                   </div>
+                   <p class="has-text-grey">
+                     <a href="../">Mot de passe oublié</a> &nbsp;·&nbsp;
+                   </p>
+                 </div>
+               </div>
+           </div>
+  </section>
+</body>
+</html>
