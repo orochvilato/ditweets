@@ -10,6 +10,8 @@ import os
 
 def AUTH(app,path=''):
     app.add_url_rule(path+'/login',view_func=LoginView.as_view('login'))
+    #app.add_url_rule(path+'/signin',view_func=LoginView.as_view('signin'))
+
     app.add_url_rule(path+'/logout',view_func=logoutview)
     app.add_url_rule(path+'/logged',view_func=loggedview)
     app.add_url_rule(path+'/reset_password',view_func=reset_passwordview)
@@ -41,16 +43,18 @@ def reset_passwordview():
 class LoginView(View):
     methods = ['GET','POST']
     def dispatch_request(self):
-        print(request.form,request.method)
-        user = request.form.get('username')
-        password = request.form.get('password')
-        rdir = request.form.get('redirect')
-        import json
-        if auth.authenticate(user,password):
-            session['id'] = {'username':user,'password':password}
-            return json.dumps({'username':user})
-        else:
-            return redirect(url_for(rdir))
+        if request.method=='GET':
+            return render_template('login.html')
+        elif request.method=='POST':
+            user = request.form.get('username')
+            password = request.form.get('password')
+            #rdir = request.form.get('redirect')
+            import json
+            if auth.authenticate(user,password):
+                session['id'] = {'username':user,'password':password}
+                return redirect(url_for(session['redirect']))
+            else:
+                return render_template('login.html',loginerror=True)
 
 def logoutview():
     if 'id' in session:
@@ -70,13 +74,15 @@ def loggedview():
         return json.dumps({})
 
 
-def require_login(redirect):
+def require_login(redir):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args,**kwargs):
             if 'id' in session:
                 return f(*args,**kwargs)
-            return render_template("login.html",redirect=redirect)
+            else:
+                session['redirect'] = redir
+                return redirect(url_for('login'))
         return decorated_function
     return decorator
 

@@ -13,25 +13,30 @@
           <div class="container has-text-centered">
               <div class="column is-4 is-offset-4">
               <div class="box">
-                    <h1>Connexion</h1>
+                    <h2>Créer un cmpte</h2>
 
-                     <form action="login" method="post">
-
-                       <div class="field">
-                         {% if loginerror %}<p class="help is-danger">L'utilisateur ou le mot de passe est incorrect</p>{% endif %}
-                         <div class="control">
-                           <input name="username" class="input is-medium{% if loginerror %} is-danger{% endif %}" type="text" placeholder="Utilisateur" autofocus="">
-
-                       </div>
-
+                     <form action="signin" method="post">
+                       <input type="hidden" name="redirect" value="{{redirect}}">
                        <div class="field">
                          <div class="control">
-                           <input name="password" class="input is-medium{% if loginerror %} is-danger{% endif %}" type="password" placeholder="Mot de passe">
+                           <input name="username" class="input is-medium" type="text" placeholder="Utilisateur" autofocus="">
                          </div>
-
                        </div>
 
-                       <input type="submit" class="button is-block is-primary is-medium is-fullwidth" value="Login">
+                       <div class="field">
+                         <div class="control">
+                           <input name="password" class="input is-medium" type="password" placeholder="Mot de passe">
+                         </div>
+                       </div>
+
+                       <div class="field">
+                         <div class="control">
+                           <input name="email" class="input is-medium" type="email" placeholder="Email">
+                         </div>
+                       </div>
+
+
+                       <input type="submit" class="button is-block is-primary is-medium is-fullwidth" value="Créer">
                      </form>
                      <br>
                      <p class="has-text-gray content is-small">
