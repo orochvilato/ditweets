@@ -10,8 +10,8 @@ import os
 
 def AUTH(app,path=''):
     app.add_url_rule(path+'/login',view_func=LoginView.as_view('login'))
-    #app.add_url_rule(path+'/signin',view_func=LoginView.as_view('signin'))
-
+    app.add_url_rule(path+'/signin',view_func=SigninView.as_view('signin'))
+    app.add_url_rule(path+'/reset_request',view_func=ResetRequestView.as_view('reset_request'))
     app.add_url_rule(path+'/logout',view_func=logoutview)
     app.add_url_rule(path+'/logged',view_func=loggedview)
     app.add_url_rule(path+'/reset_password',view_func=reset_passwordview)
@@ -20,12 +20,23 @@ def AUTH(app,path=''):
 from diskcache import Cache
 cache = Cache('/tmp/cache_ditweets')
 
+class ResetRequestView(View):
+    methods = ['GET','POST']
+    def dispatch_request(self):
+        if request.method=='GET':
+            return render_template('reset_request.html')
+        elif request.method=='POST':
+            username = request.form.get('username')
+            import uuid
+            uid = str(uuid.uuid4())
+            cache.set(uid,username,expire=360)
+            return uid
+
+
 def reset_passwordview():
     import uuid
     uid = str(uuid.uuid4())
     username = request.args.get('username')
-    method = request.args.get('method')
-    print(request.method)
     if method=='POST':
         newpass = request.args.get('password')
         uid = request.args.get('uid')
@@ -38,6 +49,22 @@ def reset_passwordview():
     else:
         cache.set(uid,username,expire=360)
         return uid
+
+
+class SigninView(View):
+    methods = ['GET','POST']
+    def dispatch_request(self):
+        if request.method=='GET':
+            return render_template('signin.html')
+        elif request.method=='POST':
+            user = request.form.get('username')
+            password = request.form.get('password')
+            email = request.form.get('email',None)
+            if auth.create_user(user,password,email):
+                session['id'] = {'username':user,'password':password}
+                return redirect(url_for('login'))
+            else:
+                return render_template('signin.html',signinerror=True)
 
 
 class LoginView(View):
@@ -103,9 +130,14 @@ class Auth:
     def __init__(self):
         pass
 
+    def exists(self,username):
+        userdir = self._getdir(username)
+        return os.path.exists(userdir)
+
     def _getdir(self,username):
         username = username.replace('/','').replace('.','').replace('?','')
         return os.path.join(self.path,username)
+
     def get_dir(self,username):
         userdir = self._getdir(username)
         if os.path.exists(userdir):
@@ -138,19 +170,20 @@ class Auth:
             os.makedirs(path)
         self.path = path
 
-
-    def authenticate(self,username, password):
+    def create_user(self,username, password, email):
         userdir = self._getdir(username)
         if not os.path.exists(userdir):
             os.makedirs(userdir)
-            self.set_data(username,{})
+            self.set_data(username,{'email':email})
             self.set_pwd(username,password)
             return True
+        else:
+            return False
 
+    def authenticate(self,username, password):
+        userdir = self._getdir(username)
         hash = self.get_pwd(username)
         return pbkdf2_sha256.verify(password,hash)
-
-
 
     def update_data(self,username,newdata):
         data = self.get_data(username)

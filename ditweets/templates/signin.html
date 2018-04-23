@@ -13,13 +13,13 @@
           <div class="container has-text-centered">
               <div class="column is-4 is-offset-4">
               <div class="box">
-                    <h2>Créer un cmpte</h2>
+                    <h2>Créer un compte</h2>
 
                      <form action="signin" method="post">
-                       <input type="hidden" name="redirect" value="{{redirect}}">
                        <div class="field">
                          <div class="control">
-                           <input name="username" class="input is-medium" type="text" placeholder="Utilisateur" autofocus="">
+                           <input name="username" class="input is-medium{% if signinerror %} is-danger{% endif %}" type="text" placeholder="Utilisateur" autofocus="">
+                           {% if signinerror %}<p class="help is-danger">Utilisateur existant</p>{% endif %}
                          </div>
                        </div>
 
@@ -39,10 +39,6 @@
                        <input type="submit" class="button is-block is-primary is-medium is-fullwidth" value="Créer">
                      </form>
                      <br>
-                     <p class="has-text-gray content is-small">
-                                 <a href="../">Créer un compte</a> &nbsp;·&nbsp;
-                                 <a href="../">Mot de passe oublié</a>
-                               </p>
                    </div>
 
                  </div>
