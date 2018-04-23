@@ -14,15 +14,15 @@
               <div class="column is-4 is-offset-4">
               <div class="box">
                     <h1>Connexion</h1>
-
+                    <br>
                      <form action="login" method="post">
 
                        <div class="field">
                          {% if loginerror %}<p class="help is-danger">L'utilisateur ou le mot de passe est incorrect</p>{% endif %}
                          <div class="control">
                            <input name="username" class="input is-medium{% if loginerror %} is-danger{% endif %}" type="text" placeholder="Utilisateur" autofocus="">
-
-                       </div>
+                        </div>
+                      </div>
 
                        <div class="field">
                          <div class="control">
