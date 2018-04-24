@@ -88,13 +88,35 @@ def sendmail(sender,recipients,subject,msg='',attach=[]):
 
     #[('attached content', 'text', 'plain', 'text.txt', 'utf-8')]
     smtp_host = SMTP_HOST
-    ret=pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host,smtp_port=smtp['port'],smtp_mode=smtp['mode'],smtp_login=smtp['username'],smtp_password=smtp['password'])
+    ret=pyzmail.send_mail(payload, mail_from, rcpt_to, smtp_host, smtp_port=smtp['port'], smtp_mode=smtp['mode'],smtp_login=smtp['username'],smtp_password=smtp['password'])
 
     if isinstance(ret, dict):
         if ret:
             print('failed recipients:', ', '.join(ret.keys()))
     else:
         print('error:', ret)
+
+def sendmail2(sender, recipient, subject, msg=''):
+
+    import smtplib
+    from email.mime.text import MIMEText
+
+    title = subject
+    msg_content = """<html><head></head><body>"""+msg+"</body></html>"
+    message = MIMEText(msg_content, 'html')
+
+    message['From'] = sender
+    message['To'] = recipient
+    message['Subject'] = subject
+
+    msg_full = message.as_string()
+
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server = smtplib.SMTP(smtp['host'],smtp['port'])
+    server.starttls()
+    server.login(smtp['username'],smtp['password'])
+    server.sendmail(sender, recipient, msg_full)
+    server.quit()
 
 def api_notify(subject,msg="",attach=[],recipients=NOTIFY_ADDRESS):
     sendmail(('ditweets','api@observatoire-democratie.fr'),recipients,subject,msg,attach)

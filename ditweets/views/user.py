@@ -4,6 +4,6 @@ from ditweets import app
 from ditweets.auth import require_login
 
 @app.route('/')
-@require_login(redir='test')
-def test():
+@require_login(redir='root')
+def root():
     return "boom"

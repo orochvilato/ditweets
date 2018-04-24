@@ -4,6 +4,7 @@
 from functools import wraps
 from flask import g, request, redirect, url_for, make_response, session, Response, render_template
 from flask.views import View
+from  ditweets.tools import sendmail2
 import sys
 import json
 import os
@@ -14,7 +15,7 @@ def AUTH(app,path=''):
     app.add_url_rule(path+'/reset_request',view_func=ResetRequestView.as_view('reset_request'))
     app.add_url_rule(path+'/logout',view_func=logoutview)
     app.add_url_rule(path+'/logged',view_func=loggedview)
-    app.add_url_rule(path+'/reset_password',view_func=reset_passwordview)
+    app.add_url_rule(path+'/reset_password',view_func=ResetPasswordView.as_view('reset_password'))
     auth.init(app.app_path)
 
 from diskcache import Cache
@@ -30,25 +31,30 @@ class ResetRequestView(View):
             import uuid
             uid = str(uuid.uuid4())
             cache.set(uid,username,expire=360)
-            return uid
+            data = auth.get_data(username)
+            email = data['email']
+            msg = u"""Pour reinitiliser votre mot de passe cliquer <a href="{url}">ici</a>""".format(url=url_for('reset_password', uid=uid, _external=True))
+            if email:
+                print(email)
+                sendmail2("DITweets.di",email,u"Réinitialisation mot de passe",msg=msg)
+                return render_template('reset_request.html', sent=True)
 
+class ResetPasswordView(View):
+    methods = ['GET','POST']
+    def dispatch_request(self):
+        if request.method=='GET':
+            uid = request.args.get('uid',None)
+            return render_template('reset_password.html', uid=uid)
+        elif request.method=='POST':
+            uid = request.form.get('uid')
+            newpass = request.form.get('password')
+            username = cache.get(uid)
+            if not username:
+                return json.dumps({})
+            auth.set_pwd(username,newpass)
+            del cache[uid]
+            return json.dumps({'username':username})
 
-def reset_passwordview():
-    import uuid
-    uid = str(uuid.uuid4())
-    username = request.args.get('username')
-    if method=='POST':
-        newpass = request.args.get('password')
-        uid = request.args.get('uid')
-        username = cache.get(uid)
-        if not username:
-            return json.dumps({})
-        auth.set_pwd(username,newpass)
-        del cache[uid]
-        return json.dumps({'username':username})
-    else:
-        cache.set(uid,username,expire=360)
-        return uid
 
 
 class SigninView(View):
@@ -86,7 +92,7 @@ class LoginView(View):
 def logoutview():
     if 'id' in session:
         del session['id']
-    return json.dumps({'result':"logout"})
+    return redirect('root')
 
 def loggedview():
     import json
