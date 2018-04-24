@@ -53,7 +53,7 @@ class ResetPasswordView(View):
                 return json.dumps({})
             auth.set_pwd(username,newpass)
             del cache[uid]
-            return json.dumps({'username':username})
+            return redirect('/')
 
 
 
@@ -189,6 +189,8 @@ class Auth:
     def authenticate(self,username, password):
         userdir = self._getdir(username)
         hash = self.get_pwd(username)
+        if not hash or not password:
+            return False
         return pbkdf2_sha256.verify(password,hash)
 
     def update_data(self,username,newdata):

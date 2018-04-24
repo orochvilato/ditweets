@@ -5,7 +5,10 @@ api = twitter.Api(consumer_key='wp6z34wTKT1qEgpACclxE2mNb',
                   access_token_secret='Iznn3zJzqpHez9FKwbFrejUk23FwWhmminPx4rsvWGDqZ')
 
 #status = api.PostUpdate('test ditweets')
-user="SraMYaguchi"
+user="JLMelenchon"
+statuses = api.GetUserTimeline(screen_name=user)
+print([s.id for s in statuses],len(statuses))
+exit(0)
 lastTweet=api.GetUserTimeline(screen_name=user)[0]
 print(lastTweet)
 print(lastTweet.id)
