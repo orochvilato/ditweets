@@ -92,7 +92,7 @@ class LoginView(View):
 def logoutview():
     if 'id' in session:
         del session['id']
-    return redirect('root')
+    return redirect('/')
 
 def loggedview():
     import json

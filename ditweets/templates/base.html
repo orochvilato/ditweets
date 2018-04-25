@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DITweets</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+    <style>
+    .is-vertical-center {
+      display: flex;
+      align-items: center;
+    }
+    </style>
+  </head>
+  <body class="layout-default">
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <span class="navbar-item">DITweets</span>
+    </div>
+    <div class="navbar-start">
+      <a class="navbar-item" href="/"><i class="fas fa-sliders-h"></i></a>
+    </div>
+    <div class="navbar-end">
+      <a class="navbar-item" href="/config"><i class="fas fa-cogs"></i></a>
+      <span class="navbar-item">{{ session['id']['username'] }}</span>
+      <a class="navbar-item" href="/logout"><i class="fas fa-power-off"></i></a>
+    </div>
+
+  </nav>
+
+  {% block content %}
+  {% endblock %}
+</body>
+</html>

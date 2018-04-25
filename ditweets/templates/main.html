@@ -1,45 +1,20 @@
-<!DOCTYPE html>
-<html class="has-navbar-fixed-top">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>DITweets</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.0/css/bulma.min.css">
-    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
-    <style>
-
-    </style>
-  </head>
-  <body class="layout-default">
-    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-      <a class="navbar-item" href="https://bulma.io">
-        <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: a modern CSS framework based on Flexbox" width="112" height="28">
-      </a>
-
-      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-      </a>
-    </div>
-  </nav>
-  <section class="container">
+{% extends "base.html" %}
+{% block content %}
+<section class="container">
+  <hr/>
+  <h3 class="title">Préférences</h3>
     <form action="login" method="post">
-      <label class="checkbox">
-  <input type="checkbox">
-  Remember me
-</label>
-{% for i in range(40) %}
+
+{% for account in accounts %}
 <div class="columns">
-  <div class="column is-one-fifth">
-    Titre
+  <div class="column">
+    <span class="content is-large"><strong>{{ account }}</strong></span>
   </div>
   <div class="column">
     <div class="box">
       <div class="field is-horizontal">
         <div class="field-label">
-          <i class="fab fa-twitter"></i>
+          <i class="fab fa-twitter has-text-info"></i>
         </div>
         <div class="field-body">
           <div class="field">
@@ -62,7 +37,7 @@
     <div class="box">
       <div class="field is-horizontal">
         <div class="field-label">
-          <i class="fas fa-retweet"></i>
+          <i class="fas fa-retweet has-text-info"></i>
         </div>
         <div class="field-body">
           <div class="field">
@@ -85,7 +60,7 @@
     <div class="box">
       <div class="field is-horizontal">
         <div class="field-label">
-          <i class="fas fa-heart"></i>
+          <i class="fas fa-heart has-text-danger"></i>
         </div>
         <div class="field-body">
           <div class="field">
@@ -106,9 +81,7 @@
   </div>
 </div>
 
-
 {% endfor %}
     </form>
   </section>
-</body>
-</html>
+{% endblock %}

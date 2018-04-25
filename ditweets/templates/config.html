@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container">
+<form id="twitter" action="config_twitter" method="post"></form>
+<hr/>
+<h3 class="title">Twitter {% if twitter_success %}<i class="far fa-check-circle has-text-success"></i>{% else %}<i class="far fa-times-circle has-text-danger"></i>{% endif %}</h3>
+
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Consumer Key</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="twitter_consumer_key" class="input" type="text" placeholder="(API Key)" form="twitter" value="{{ twitter_consumer_key }}">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Consumer Secret</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="twitter_consumer_secret" class="input" type="text" placeholder="(API Secret)" form="twitter" value="{{ twitter_consumer_secret }}">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Access Token</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="twitter_access_token" class="input" type="text" placeholder="" form="twitter" value="{{ twitter_access_token }}">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Access Token Secret</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="twitter_access_token_secret" class="input" type="text" placeholder="" form="twitter" value="{{ twitter_access_token_secret }}">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="field is-horizontal">
+  <div class="field-label">
+    <!-- Left empty for spacing -->
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input type="submit" class="button is-primary" form="twitter">
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+{% endblock %}
