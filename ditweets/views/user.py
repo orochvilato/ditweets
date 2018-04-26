@@ -5,8 +5,13 @@ from ditweets.auth import require_login, auth, session, redirect
 from flask import render_template, request
 import json
 
-accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis"]
+accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis",'worldtvdesinfo','InstitutOPIF','LeMediaTV','LaFranceInsoumise']
 
+
+@app.route('/check')
+def check():
+    pass
+    
 def twitterAccount():
     import twitter
     username = session['id']['username']
@@ -21,7 +26,9 @@ def twitterAccount():
 @app.route('/')
 @require_login(redir='root')
 def root():
-    return render_template('main.html',session=session,accounts=accounts)
+    username = session['id']['username']
+    data = auth.get_data(username)
+    return render_template('main.html',session=session,accounts=accounts,params=data.get('params',{}))
 
 @app.route('/config')
 @require_login(redir='config')
@@ -51,3 +58,11 @@ def config_twitter():
                       'twitter_access_token': request.form.get('twitter_access_token')}
     auth.update_data(username,twitter_config)
     return redirect('/config')
+
+@app.route('/params', methods=["POST"])
+@require_login(redir='/')
+def params():
+    username = session['id']['username']
+    data = auth.get_data(username)
+    auth.update_data(username,{'params':request.form.to_dict()})
+    return redirect('/')

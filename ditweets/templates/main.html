@@ -1,87 +1,103 @@
 {% extends "base.html" %}
 {% block content %}
+<style>
+.cbutton {
+  min-width:2em;
+}
+.cbutton input:checked + span {
+  background-color: #00d1b2;
+  color: white;
+}
+.sticky {
+  margin: 0;
+  padding: 2px 0 0 12px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 40px;
+}
+</style>
 <section class="container">
   <hr/>
-  <h3 class="title">Préférences</h3>
-    <form action="login" method="post">
+  <form action="params" method="post">
+  <h3 class="title">Préférences   <input type="submit" class="button is-primary"></h3>
 
+
+<table class="table is-fullwidth is-hoverable">
+  <thead>
+    <tr><th>Comptes</th><th>Tout</th><th><i class="fab fa-twitter"></i> Tweets</th><th><i class="fas fa-retweet"></i> Retweets</th><th><i class="fas fa-heart"></i> Likes</th></tr>
+    <tr><th></th>
+      <th><span onclick="select_all(['tweets_rt','retweets_rt','likes_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+          <span onclick="select_all(['tweets_like','retweets_like','likes_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+          <th><span onclick="select_all(['tweets_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+              <span onclick="select_all(['tweets_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+      <th><span onclick="select_all(['retweets_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+          <span onclick="select_all(['retweets_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+      <th><span onclick="select_all(['likes_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+          <span onclick="select_all(['likes_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+
+    </tr>
+  </thead>
+  <tbody>
 {% for account in accounts %}
-<div class="columns">
-  <div class="column">
-    <span class="content is-large"><strong>{{ account }}</strong></span>
-  </div>
-  <div class="column">
-    <div class="box">
-      <div class="field is-horizontal">
-        <div class="field-label">
-          <i class="fab fa-twitter has-text-info"></i>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <label class="checkbox">
-                <input type="checkbox" name="member">
-                RT
-              </label>
-              <label class="checkbox">
-                <input type="checkbox" name="member">
-                Like
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="column">
-    <div class="box">
-      <div class="field is-horizontal">
-        <div class="field-label">
-          <i class="fas fa-retweet has-text-info"></i>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <label class="checkbox">
-                <input type="checkbox" name="member">
-                RT
-              </label>
-              <label class="checkbox">
-                <input type="checkbox" name="member">
-                Like
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="column">
-    <div class="box">
-      <div class="field is-horizontal">
-        <div class="field-label">
-          <i class="fas fa-heart has-text-danger"></i>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <label class="checkbox">
-                <input type="checkbox" name="member">
-                RT
-              </label>
-              <label class="checkbox">
-                <input type="checkbox" name="member">
-                Like
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<tr>
+  <td><span class="content is-medium"><strong>@{{ account }}</strong></span></td>
+  <td>
+    <span onclick="select_all(['{{ account }}_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+    <span onclick="select_all(['{{ account }}_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span>
+  </td>
+  <td><span class="cbutton">
+   <label>
+      <input class="{{ account }}_rt tweets_rt" name="{{ account }}_tweets_rt" type="checkbox" {% if params.get('%s_tweets_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
+   </label>
+</span>
+<span class="cbutton">
+ <label>
+    <input class="{{ account }}_like tweets_like" name="{{ account }}_tweets_like" type="checkbox" {% if params.get('%s_tweets_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
+ </label>
+</span></td>
 
+<td><span class="cbutton">
+ <label>
+    <input class="{{ account }}_rt retweets_rt" name="{{ account }}_retweets_rt" type="checkbox" {% if params.get('%s_retweets_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
+ </label>
+</span>
+<span class="cbutton">
+<label>
+  <input class="{{ account }}_like retweets_like" name="{{ account }}_retweets_like" type="checkbox" {% if params.get('%s_retweets_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
+</label>
+</span></td>
+
+<td><span class="cbutton">
+ <label>
+    <input class="{{ account }}_rt likes_rt" name="{{ account }}_likes_rt" type="checkbox" {% if params.get('%s_likes_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
+ </label>
+</span>
+<span class="cbutton">
+<label>
+  <input class="{{ account }}_like likes_like" name="{{ account }}_likes_like" type="checkbox" {% if params.get('%s_likes_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
+</label>
+</span></td>
+<td></td>
+<td></td>
+</tr>
 {% endfor %}
+</tbody>
+</table>
     </form>
   </section>
+  <script>
+  var states = {}
+  function select_all(elts) {
+    var j = 0;
+    for (j = 0; j < elts.length; j++) {
+      var elt = elts[j];
+      var x = document.getElementsByClassName(elt);
+      var i;
+      states[elt] = (states[elt]==true?false:true);
+      for (i = 0; i < x.length; i++) {
+        x[i].checked = states[elt];
+      }
+    }
+  }
+  </script>
 {% endblock %}
