@@ -62,7 +62,7 @@ def start_scheduler():
     import psutil
 
     try:
-        pid = int(open("/tmp/scheduler.pid").read())
+        pid = int(open("/tmp/scheduler_ditweets.pid").read())
     except IOError:
         pid = 0
 
@@ -70,7 +70,7 @@ def start_scheduler():
         pass
         print("scheduler deja lance")
     else:
-        open("/tmp/scheduler.pid","w").write("%d" % os.getpid())
+        open("/tmp/scheduler_ditweets.pid","w").write("%d" % os.getpid())
 
 
         walk_pkg(__path__)
