@@ -36,7 +36,7 @@ def getTwitterData(api):
         #twitter_ids[account]['tweets'] =
         #twitter_ids[account]['retweets'] = api.GetRetweets(screen_name=account,**params)
     cache['tweeter_last_id'] = maxId
-    return "ok"
+    return twitter_ids
 
 import json
 def twitter_job():
@@ -70,4 +70,4 @@ def twitter_job():
                 api.CreateFavorite(status_id=id, include_entities=False)
             except:
                 pass
-    return json.dumps(twitter_ids)
+    return 'ok'
