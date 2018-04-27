@@ -33,7 +33,9 @@ class ResetRequestView(View):
             cache.set(uid,username,expire=360)
             data = auth.get_data(username)
             email = data['email']
-            msg = u"""Pour reinitiliser votre mot de passe cliquer <a href="{url}">ici</a>""".format(url=url_for('reset_password', uid=uid, _external=True))
+            url = request.form.get('domain')+url_for('reset_password', uid=uid)
+            print(url)
+            msg = u"""Pour reinitiliser votre mot de passe cliquer <a href="{url}">ici</a>""".format(url=url)
             if email:
                 print(email)
                 sendmail2("DITweets.di",email,u"Réinitialisation mot de passe",msg=msg)

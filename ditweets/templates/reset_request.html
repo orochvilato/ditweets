@@ -18,6 +18,7 @@
               {% else %}
               <h2>Réinitialisation mot de passe</h2>
                <form action="reset_request" method="post">
+                 <input id="domain" name="domain" type="hidden">
                  <div class="field">
                    <div class="control">
                      <input name="username" class="input is-medium" type="text" placeholder="Utilisateur" autofocus="">
@@ -31,5 +32,8 @@
             </div>
         </div>
   </section>
+  <script>
+  document.getElementById("domain").value = window.location.host;
+  </script>
 </body>
 </html>
