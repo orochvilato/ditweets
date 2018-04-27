@@ -9,7 +9,7 @@ import json
 
 
 
-from ditweets.controllers.twitter import twitter_job
+from ditweets.controllers.twitter import twitter_job, twitterAccount
 
 @app.route('/forcetask')
 def forcetask():
