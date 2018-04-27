@@ -111,10 +111,11 @@ def sendmail2(sender, recipient, subject, msg=''):
 
     msg_full = message.as_string()
 
-    server = smtplib.SMTP('smtp.gmail.com:587')
     server = smtplib.SMTP(smtp['host'],smtp['port'])
-    server.starttls()
-    server.login(smtp['username'],smtp['password'])
+    if smtp['mode']!='normal':
+        server.starttls()
+    if smtp['username']:
+        server.login(smtp['username'],smtp['password'])
     server.sendmail(sender, recipient, msg_full)
     server.quit()
 
