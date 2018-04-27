@@ -36,7 +36,7 @@ def getTwitterData(api):
         #twitter_ids[account]['tweets'] =
         #twitter_ids[account]['retweets'] = api.GetRetweets(screen_name=account,**params)
     cache['tweeter_last_id'] = maxId
-    return twitter_ids
+    return "ok"
 
 import json
 def twitter_job():
