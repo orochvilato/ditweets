@@ -10,22 +10,23 @@ accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis",'worldtvdesinf
 
 @app.route('/check')
 def check():
-    api = twitterAccount()
+
     username = session['id']['username']
     allparams = {}
     for data in auth.users_data():
-        for k,v in data.items():
-            allparams[k] = allparams.get(k,[]) + [v]
+        api = twitterAccount(data)
+        actions = {}
+        for account in accounts:
+            for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like')]:
+                item = "{account}_{item}_{action}".format(account=account, item=_item, action=_action)
+                print(item)
+                if item in data.get('params',{}).keys():
+                    actions[_item] = actions.get(_item,[]) + [ _action ]
+            print(actions)
+    return json.dumps(actions)
 
-    return json.dumps(allparams)
-    for account in accounts:
-        pass
-
-def twitterAccount():
+def twitterAccount(data):
     import twitter
-    username = session['id']['username']
-    data = auth.get_data(username)
-
     api = twitter.Api(consumer_key=data.get('twitter_consumer_key','nope'),
                       consumer_secret=data.get('twitter_consumer_secret','nope'),
                       access_token_key=data.get('twitter_access_token','nope'),
@@ -45,7 +46,7 @@ def config():
     username = session['id']['username']
     data = auth.get_data(username)
     # check twitter
-    tapi = twitterAccount()
+    tapi = twitterAccount(data)
     try:
         lasttweet = tapi.GetUserTimeline(count=1)
         twitter_success = True
