@@ -10,8 +10,17 @@ accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis",'worldtvdesinf
 
 @app.route('/check')
 def check():
-    pass
-    
+    api = twitterAccount()
+    username = session['id']['username']
+    allparams = {}
+    for data in auth.users_data():
+        for k,v in data.items():
+            allparams[k] = allparams.get(k,[]) + [v]
+
+    return json.dumps(allparams)
+    for account in accounts:
+        pass
+
 def twitterAccount():
     import twitter
     username = session['id']['username']

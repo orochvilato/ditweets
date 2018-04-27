@@ -200,5 +200,10 @@ class Auth:
         data.update(newdata)
         self.set_data(username,data)
 
+    def users_data(self):
+        for user in os.listdir(self.path):
+            yield self.get_data(user)
+
+
 
 auth = Auth()
