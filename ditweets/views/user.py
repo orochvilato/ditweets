@@ -1,37 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from ditweets import app
-from ditweets.auth import require_login, auth, session, redirect
-from flask import render_template, request
+from ditweets import app, cache
+from ditweets.auth import require_login, auth
+from flask import render_template, request, session, redirect
 import json
 
-accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis",'worldtvdesinfo','InstitutOPIF','LeMediaTV','LaFranceInsoumise']
 
 
-@app.route('/check')
-def check():
 
-    username = session['id']['username']
-    allparams = {}
-    for data in auth.users_data():
-        api = twitterAccount(data)
-        actions = {}
-        for account in accounts:
-            for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like')]:
-                item = "{account}_{item}_{action}".format(account=account, item=_item, action=_action)
-                print(item)
-                if item in data.get('params',{}).keys():
-                    actions[_item] = actions.get(_item,[]) + [ _action ]
-            print(actions)
-    return json.dumps(actions)
 
-def twitterAccount(data):
-    import twitter
-    api = twitter.Api(consumer_key=data.get('twitter_consumer_key','nope'),
-                      consumer_secret=data.get('twitter_consumer_secret','nope'),
-                      access_token_key=data.get('twitter_access_token','nope'),
-                      access_token_secret=data.get('twitter_access_token_secret','nope'))
-    return api
+from ditweets.controllers.twitter import twitter_job
+
+@app.route('/forcetask')
+def forcetask():
+    return twitter_job()
+
 
 @app.route('/')
 @require_login(redir='root')
@@ -49,11 +32,13 @@ def config():
     tapi = twitterAccount(data)
     try:
         lasttweet = tapi.GetUserTimeline(count=1)
-        twitter_success = True
+        data['twitter_success'] = True
     except:
-        twitter_success = False
+        data['twitter_success'] = False
 
-    return render_template('config.html',twitter_success=twitter_success,**data)
+    auth.update_data(username,{'twitter_success':data['twitter_success']})
+
+    return render_template('config.html',**data)
 
 @app.route('/config_twitter', methods=["POST"])
 @require_login(redir='config')

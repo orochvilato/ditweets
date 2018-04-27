@@ -13,6 +13,7 @@ CORS(app)
 
 import os.path
 
+accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis",'worldtvdesinfo','InstitutOPIF','LeMediaTV']
 
 app.secret_key = privatekey
 app.app_path = '/'.join(os.path.abspath(__file__).split('/')[:-2])
@@ -20,6 +21,7 @@ AUTH(app)
 
 from diskcache import Cache
 cache = Cache('/tmp/cache_ditweets')
+
 
 
 @app.route('/testerror')
