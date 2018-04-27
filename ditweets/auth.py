@@ -66,7 +66,7 @@ class SigninView(View):
             user = request.form.get('username')
             password = request.form.get('password')
             email = request.form.get('email',None)
-            if request.form.get('nobot').lower!='sram':
+            if request.form.get('nobot').lower()!='sram':
                 return render_template('signin.html',boterror=True)
             if auth.create_user(user,password,email):
                 session['id'] = {'username':user,'password':password}

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ditweets import app, cache
+from ditweets import app, cache, accounts
 from ditweets.auth import require_login, auth
 from flask import render_template, request, session, redirect
 import json
