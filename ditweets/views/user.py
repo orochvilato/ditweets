@@ -21,7 +21,17 @@ def forcetask():
 def root():
     username = session['id']['username']
     data = auth.get_data(username)
-    return render_template('main.html',session=session,accounts=accounts,params=data.get('params',{}))
+    if data.get('twitter_success',False):
+        return redirect('/param')
+    else:
+        return redirect('config')
+
+@app.route('/param')
+@require_login(redir='param')
+def param():
+    username = session['id']['username']
+    data = auth.get_data(username)
+    return render_template('param.html',session=session,accounts=accounts,params=data.get('params',{}))
 
 @app.route('/config')
 @require_login(redir='config')
@@ -60,4 +70,4 @@ def params():
     username = session['id']['username']
     data = auth.get_data(username)
     auth.update_data(username,{'params':request.form.to_dict()})
-    return redirect('/')
+    return redirect('/param')

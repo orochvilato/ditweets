@@ -89,7 +89,7 @@ class LoginView(View):
             import json
             if auth.authenticate(user,password):
                 session['id'] = {'username':user,'password':password}
-                return redirect(url_for(session['redirect']))
+                return redirect('/')
             else:
                 return render_template('login.html',loginerror=True)
 
