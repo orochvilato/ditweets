@@ -44,7 +44,7 @@
 {% for account in comptes[cat] %}
 {% set icat = cloop.index %}
 <tr>
-  <td><span class="content is-medium">@{{ account }}</span></td>
+  <td><span class="content is-medium"><a class="has-text-dark" target="_blank" href="https://twitter.com/{{account}}">@{{ account }}</a></span></td>
   <td>
     <span onclick="select_all(['{{ account }}_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
     <span onclick="select_all(['{{ account }}_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span>
