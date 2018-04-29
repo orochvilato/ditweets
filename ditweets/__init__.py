@@ -12,7 +12,7 @@ app = Flask(__name__)
 CORS(app)
 
 import os.path
-
+#@Action_Insoumis @InstantEnCommun @Obs_Democratie @RadioInsoumise  @LAEC_fr @Fiscal_Kombat ‏@FAQdeLAEC ‏@elonmusk @Macroverdose @worldtvdesinfo @InstitutOPIF @le_firagot @LeDeconex ‏@GocheOuDrouate ‏@melenshack @postbadjeanluc#5511 ‏@RuffinDebout ‏@Fakir_ ‏@PicardieDebout ‏@LeMediaTV @InsoumisJeunes  @FranceInsoumise ‏ @JLMelenchon
 accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis",'worldtvdesinfo','InstitutOPIF','LeMediaTV']
 
 app.secret_key = privatekey

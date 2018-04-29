@@ -11,6 +11,17 @@ import json
 
 from ditweets.controllers.twitter import twitter_job, twitterAccount
 
+@app.route('/test')
+def test():
+    username = session['id']['username']
+    data = auth.get_data(username)
+    # check twitter
+    tapi = twitterAccount(data)
+    lasttweet = tapi.GetUserTimeline(screen_name="Action_Insoumis",count=30,exclude_replies=True)
+    for tweet in lasttweet:
+        print(tweet.id,tweet.text)
+    return "ok"
+    #exclude_replies
 @app.route('/forcetask')
 def forcetask():
     return twitter_job()
