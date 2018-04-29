@@ -27,16 +27,26 @@
 <h2 class="has-text-info">{{ cat }}</h2>
 <table class="table is-fullwidth is-hoverable">
   <thead>
-    <tr><th>Comptes</th><th>Tout</th><th><i class="fab fa-twitter"></i> Tweets</th><th><i class="fas fa-retweet"></i> Retweets</th><th><i class="fas fa-heart"></i> Likes</th></tr>
+    <tr>
+      <th>Comptes</th>
+      <th>Tout</th>
+      <th><i class="fab fa-twitter"></i> Tweets</th>
+      <th><i class="fas fa-retweet"></i> Retweets</th>
+      <th><i class="fas fa-heart"></i> Likes</th>
+      <th><i class="fas fa-reply"></i> Replies</th>
+    </tr>
+
     <tr><th></th>
       <th><span onclick="select_all(['tweets_rt_{{loop.index}}','retweets_rt_{{loop.index}}','likes_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
           <span onclick="select_all(['tweets_like_{{loop.index}}','retweets_like_{{loop.index}}','likes_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
-          <th><span onclick="select_all(['tweets_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+      <th><span onclick="select_all(['tweets_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
               <span onclick="select_all(['tweets_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
       <th><span onclick="select_all(['retweets_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
           <span onclick="select_all(['retweets_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
       <th><span onclick="select_all(['likes_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
           <span onclick="select_all(['likes_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+      <th><span onclick="select_all(['replies_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+          <span onclick="select_all(['replies_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
 
     </tr>
   </thead>
@@ -81,8 +91,18 @@
   <input class="{{ account }}_like likes_like_{{icat}}" name="{{ account }}_likes_like" type="checkbox" {% if params.get('%s_likes_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
 </label>
 </span></td>
-<td></td>
-<td></td>
+
+<td><span class="cbutton">
+ <label>
+    <input class="{{ account }}_rt replies_rt_{{icat}}" name="{{ account }}_replies_rt" type="checkbox" {% if params.get('%s_replies_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
+ </label>
+</span>
+<span class="cbutton">
+<label>
+  <input class="{{ account }}_like replies_like_{{icat}}" name="{{ account }}_replies_like" type="checkbox" {% if params.get('%s_replies_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
+</label>
+</span></td>
+
 </tr>
 {% endfor %}
 

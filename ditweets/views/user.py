@@ -12,7 +12,7 @@ import json
 from ditweets.controllers.twitter import twitter_job, twitterAccount
 from ditweets.controllers.imports import gsheet_twitter
 @app.route('/forcereload')
-def test():
+def forcereload():
     gsheet_twitter()
     return "ok"
 
@@ -23,6 +23,19 @@ def forcetask():
     return "ok"
 
 
+@app.route('/test')
+def test():
+    username = session['id']['username']
+    data = auth.get_data(username)
+    # check twitter
+    tapi = twitterAccount(data)
+    tweets = tapi.GetUserTimeline(screen_name="Action_Insoumis",count=30)
+    for t in tweets:
+        
+            print(t)
+        #if t.id == 990346844218757120:
+        #    print(t)
+    return "ok"
 @app.route('/')
 @require_login(redir='root')
 def root():

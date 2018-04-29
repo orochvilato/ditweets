@@ -23,12 +23,15 @@ def getTwitterData(api):
     else:
         params['count'] = 1
     maxId = lastId
+    
     for account in get_accounts_list(cache['comptes']):
         print(account)
-        twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**params), 'retweets':[], 'tweets':[]}
+        twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**params), 'retweets':[], 'tweets':[],'replies':[]}
         maxId = max([t.id for t in twitter_ids[account]['likes']]+[maxId])
-        for tweet in api.GetUserTimeline(screen_name=account,exclude_replies=True,**params):
-            if tweet.retweeted_status:
+        for tweet in api.GetUserTimeline(screen_name=account,**params):
+            if tweet.in_reply_to_screen_name:
+                twitter_ids[account]['replies'].append(tweet)
+            elif tweet.retweeted_status:
                 twitter_ids[account]['retweets'].append(tweet)
             else:
                 twitter_ids[account]['tweets'].append(tweet)
@@ -53,7 +56,7 @@ def twitter_job():
         todo = {'rt':{},'like':{}}
         for account in get_accounts_list(cache['comptes']):
             actions = {'like':[],'rt':[]}
-            for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like')]:
+            for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like'),('replies','rt'),('replies','like')]:
                 item = "{account}_{item}_{action}".format(account=account, item=_item, action=_action)
                 if item in data.get('params',{}).keys():
                     actions[_action] = actions.get(_action,[]) + [ _item ]
