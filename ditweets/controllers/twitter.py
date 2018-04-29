@@ -14,7 +14,7 @@ def twitterAccount(data):
 def getTwitterData(api):
     twitter_ids = {}
     # Recuperation ID Tweets, RT et Likes des comptes paramétrés
-    params = {exclude_replies=True}
+    params = {'exclude_replies':True}
     lastId = cache.get('tweeter_last_id',0)
     if lastId:
         params['since_id'] = lastId
