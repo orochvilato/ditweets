@@ -15,7 +15,7 @@ def gsheet_twitter():
     comptes = OrderedDict()
     for row in ws.iter_rows(min_row=1):
         if row[0].value:
-            compte = row[0].value[1:].strip()
+            compte = row[0].value.strip()[1:]
             categorie = row[1].value.strip()
             statut = row[2].value.strip()
             if statut == u'Confirmé':
