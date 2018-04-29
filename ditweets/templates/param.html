@@ -24,7 +24,7 @@
 {% for cat in comptes.keys() %}
 {% set cloop = loop %}
 <hr>
-<h2>{{ cat }}</h2>
+<h2 class="has-text-info">{{ cat }}</h2>
 <table class="table is-fullwidth is-hoverable">
   <thead>
     <tr><th>Comptes</th><th>Tout</th><th><i class="fab fa-twitter"></i> Tweets</th><th><i class="fas fa-retweet"></i> Retweets</th><th><i class="fas fa-heart"></i> Likes</th></tr>
@@ -44,7 +44,7 @@
 {% for account in comptes[cat] %}
 {% set icat = cloop.index %}
 <tr>
-  <td><span class="content is-medium"><strong>@{{ account }}</strong></span></td>
+  <td><span class="content is-medium">@{{ account }}</span></td>
   <td>
     <span onclick="select_all(['{{ account }}_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
     <span onclick="select_all(['{{ account }}_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span>
