@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
+<style>
+.spacer {
+  margin-top:100px;
+}
+</style>
 <section class="container">
 <form id="twitter" action="config_twitter" method="post"></form>
 <hr/>
@@ -73,7 +78,8 @@
 </div>
 <div class="content">
   <blockquote>Pour révoquer les accès a votre compte twitter, il vous suffit de supprimer l'application twitter via  <a href="https://apps.twitter.com">https://apps.twitter.com</a>.</blockquote></div>
-<div style="margin-top:100px;" class="content">
+<div class="spacer"></div>
+<div class="content">
   <h1>Génération des clés Twitter</h1>
   <p>Pour obtenir les clés il faut créer une application Twitter.</p>
   <h2>Création d'une application Twitter</h2>
@@ -121,6 +127,7 @@
   </ul>
 
 </div>
+<div class="spacer"></div>
 </section>
 
 {% endblock %}
