@@ -23,7 +23,7 @@ def getTwitterData(api):
     else:
         params['count'] = 1
     maxId = lastId
-    
+
     for account in get_accounts_list(cache['comptes']):
         print(account)
         twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**params), 'retweets':[], 'tweets':[],'replies':[]}
