@@ -11,7 +11,7 @@ import json
 
 from ditweets.controllers.twitter import twitter_job, twitterAccount
 from ditweets.controllers.imports import gsheet_twitter
-@app.route('/test')
+@app.route('/forcereload')
 def test():
     gsheet_twitter()
     return "ok"
@@ -19,7 +19,8 @@ def test():
 
 @app.route('/forcetask')
 def forcetask():
-    return twitter_job()
+    twitter_job()
+    return "ok"
 
 
 @app.route('/')

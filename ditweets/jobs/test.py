@@ -8,6 +8,8 @@ definition = dict(
     )
 
 from ditweets.controllers.twitter import twitter_job
+from ditweets.controllers.imports import gsheet_twitter
 
 def job(**kwargs):
-    print(twitter_job())
+    gsheet_twitter()
+    twitter_job()
