@@ -16,29 +16,33 @@
   top: 40px;
 }
 </style>
-<section class="container">
-  <hr/>
+<section class="container content">
+
   <form action="params" method="post">
-  <h3 class="title">Préférences   <input type="submit" class="button is-primary" value="Valider"></h3>
+  <h1 style="padding-top:30px;">Préférences   <input type="submit" class="button is-primary" value="Valider"></h1>
 
-
+{% for cat in comptes.keys() %}
+{% set cloop = loop %}
+<hr>
+<h2>{{ cat }}</h2>
 <table class="table is-fullwidth is-hoverable">
   <thead>
     <tr><th>Comptes</th><th>Tout</th><th><i class="fab fa-twitter"></i> Tweets</th><th><i class="fas fa-retweet"></i> Retweets</th><th><i class="fas fa-heart"></i> Likes</th></tr>
     <tr><th></th>
-      <th><span onclick="select_all(['tweets_rt','retweets_rt','likes_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
-          <span onclick="select_all(['tweets_like','retweets_like','likes_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
-          <th><span onclick="select_all(['tweets_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
-              <span onclick="select_all(['tweets_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
-      <th><span onclick="select_all(['retweets_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
-          <span onclick="select_all(['retweets_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
-      <th><span onclick="select_all(['likes_rt'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
-          <span onclick="select_all(['likes_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+      <th><span onclick="select_all(['tweets_rt_{{loop.index}}','retweets_rt_{{loop.index}}','likes_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+          <span onclick="select_all(['tweets_like_{{loop.index}}','retweets_like_{{loop.index}}','likes_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+          <th><span onclick="select_all(['tweets_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+              <span onclick="select_all(['tweets_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+      <th><span onclick="select_all(['retweets_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+          <span onclick="select_all(['retweets_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+      <th><span onclick="select_all(['likes_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+          <span onclick="select_all(['likes_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
 
     </tr>
   </thead>
   <tbody>
-{% for account in accounts %}
+{% for account in comptes[cat] %}
+{% set icat = cloop.index %}
 <tr>
   <td><span class="content is-medium"><strong>@{{ account }}</strong></span></td>
   <td>
@@ -47,42 +51,45 @@
   </td>
   <td><span class="cbutton">
    <label>
-      <input class="{{ account }}_rt tweets_rt" name="{{ account }}_tweets_rt" type="checkbox" {% if params.get('%s_tweets_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
+      <input class="{{ account }}_rt tweets_rt_{{icat}}" name="{{ account }}_tweets_rt" type="checkbox" {% if params.get('%s_tweets_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
    </label>
 </span>
 <span class="cbutton">
  <label>
-    <input class="{{ account }}_like tweets_like" name="{{ account }}_tweets_like" type="checkbox" {% if params.get('%s_tweets_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
+    <input class="{{ account }}_like tweets_like_{{icat}}" name="{{ account }}_tweets_like" type="checkbox" {% if params.get('%s_tweets_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
  </label>
 </span></td>
 
 <td><span class="cbutton">
  <label>
-    <input class="{{ account }}_rt retweets_rt" name="{{ account }}_retweets_rt" type="checkbox" {% if params.get('%s_retweets_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
+    <input class="{{ account }}_rt retweets_rt_{{icat}}" name="{{ account }}_retweets_rt" type="checkbox" {% if params.get('%s_retweets_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
  </label>
 </span>
 <span class="cbutton">
 <label>
-  <input class="{{ account }}_like retweets_like" name="{{ account }}_retweets_like" type="checkbox" {% if params.get('%s_retweets_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
+  <input class="{{ account }}_like retweets_like_{{icat}}" name="{{ account }}_retweets_like" type="checkbox" {% if params.get('%s_retweets_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
 </label>
 </span></td>
 
 <td><span class="cbutton">
  <label>
-    <input class="{{ account }}_rt likes_rt" name="{{ account }}_likes_rt" type="checkbox" {% if params.get('%s_likes_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
+    <input class="{{ account }}_rt likes_rt_{{icat}}" name="{{ account }}_likes_rt" type="checkbox" {% if params.get('%s_likes_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
  </label>
 </span>
 <span class="cbutton">
 <label>
-  <input class="{{ account }}_like likes_like" name="{{ account }}_likes_like" type="checkbox" {% if params.get('%s_likes_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
+  <input class="{{ account }}_like likes_like_{{icat}}" name="{{ account }}_likes_like" type="checkbox" {% if params.get('%s_likes_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
 </label>
 </span></td>
 <td></td>
 <td></td>
 </tr>
 {% endfor %}
+
 </tbody>
 </table>
+{% endfor %}
+
     </form>
   </section>
   <script>

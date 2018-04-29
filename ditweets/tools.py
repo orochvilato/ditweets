@@ -2,6 +2,11 @@ from flask import Response,request,make_response
 
 import datetime
 
+def get_accounts_list(accounts):
+    lst = []
+    for cat in accounts.keys():
+        lst += accounts[cat]
+    return lst
 
 def json_response(r):
     import json

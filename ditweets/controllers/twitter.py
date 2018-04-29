@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from ditweets import cache,accounts
+
+from ditweets import cache
 from ditweets.auth import require_login, auth
+from ditweets.tools import get_accounts_list
 
 def twitterAccount(data):
     import twitter
@@ -14,25 +16,24 @@ def twitterAccount(data):
 def getTwitterData(api):
     twitter_ids = {}
     # Recuperation ID Tweets, RT et Likes des comptes paramétrés
-    params = {'exclude_replies':True}
+    params = {}
     lastId = cache.get('tweeter_last_id',0)
     if lastId:
         params['since_id'] = lastId
     else:
         params['count'] = 1
     maxId = lastId
-    for account in accounts:
-        try:
-            twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**params), 'retweets':[], 'tweets':[]}
-            maxId = max([t.id for t in twitter_ids[account]['likes']]+[maxId])
-            for tweet in api.GetUserTimeline(screen_name=account,**params):
-                if tweet.retweeted_status:
-                    twitter_ids[account]['retweets'].append(tweet)
-                else:
-                    twitter_ids[account]['tweets'].append(tweet)
-                maxId = max([maxId,tweet.id])
-        except:
-            pass
+    for account in get_accounts_list(cache['comptes']):
+        twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**params), 'retweets':[], 'tweets':[]}
+        maxId = max([t.id for t in twitter_ids[account]['likes']]+[maxId])
+        for tweet in api.GetUserTimeline(screen_name=account,exclude_replies=True,**params):
+            if tweet.retweeted_status:
+                twitter_ids[account]['retweets'].append(tweet)
+            else:
+                twitter_ids[account]['tweets'].append(tweet)
+            maxId = max([maxId,tweet.id])
+        #except:
+        #    pass
         #twitter_ids[account]['tweets'] =
         #twitter_ids[account]['retweets'] = api.GetRetweets(screen_name=account,**params)
     cache['tweeter_last_id'] = maxId
@@ -49,7 +50,7 @@ def twitter_job():
             twitter_ids = getTwitterData(api)
 
         todo = {'rt':{},'like':{}}
-        for account in accounts:
+        for account in get_accounts_list(cache['comptes']):
             actions = {'like':[],'rt':[]}
             for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like')]:
                 item = "{account}_{item}_{action}".format(account=account, item=_item, action=_action)

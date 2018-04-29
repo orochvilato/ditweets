@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from ditweets import cache
 
-def twitter_gsheet():
+def gsheet_twitter():
     from openpyxl import load_workbook
     from io import BytesIO
     import requests
@@ -10,13 +11,17 @@ def twitter_gsheet():
     wb = load_workbook(f)
 
     ws = wb[wb.sheetnames[0]]
-    comptes = {}
+    from collections import OrderedDict
+    comptes = OrderedDict()
     for row in ws.iter_rows(min_row=1):
         if row[0].value:
-            compte = row[0].value[1:]
-            categorie = row[1].value
-            statut = row[2].value
+            compte = row[0].value[1:].strip()
+            categorie = row[1].value.strip()
+            statut = row[2].value.strip()
             if statut == u'Confirmé':
-                print(compte,categorie,statut)
+                comptes[categorie] = comptes.get(categorie,[]) + [compte]
+
+
+    cache['comptes'] = comptes
 
     return "ok"

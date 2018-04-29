@@ -10,18 +10,13 @@ import json
 
 
 from ditweets.controllers.twitter import twitter_job, twitterAccount
-
+from ditweets.controllers.imports import gsheet_twitter
 @app.route('/test')
 def test():
-    username = session['id']['username']
-    data = auth.get_data(username)
-    # check twitter
-    tapi = twitterAccount(data)
-    lasttweet = tapi.GetUserTimeline(screen_name="Action_Insoumis",count=30,exclude_replies=True)
-    for tweet in lasttweet:
-        print(tweet.id,tweet.text)
+    gsheet_twitter()
     return "ok"
-    #exclude_replies
+
+
 @app.route('/forcetask')
 def forcetask():
     return twitter_job()
@@ -42,7 +37,7 @@ def root():
 def param():
     username = session['id']['username']
     data = auth.get_data(username)
-    return render_template('param.html',session=session,accounts=accounts,params=data.get('params',{}))
+    return render_template('param.html',session=session,accounts=accounts,comptes=cache['comptes'],params=data.get('params',{}))
 
 @app.route('/config')
 @require_login(redir='config')

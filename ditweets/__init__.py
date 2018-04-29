@@ -22,6 +22,8 @@ AUTH(app)
 from diskcache import Cache
 cache = Cache('/tmp/cache_ditweets')
 
+from ditweets.controllers.imports import gsheet_twitter
+gsheet_twitter()
 
 
 @app.route('/testerror')
