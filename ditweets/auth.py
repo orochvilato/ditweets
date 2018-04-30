@@ -4,6 +4,7 @@
 from functools import wraps
 from flask import g, request, redirect, url_for, make_response, session, Response, render_template
 from flask.views import View
+from ditweets import admins
 from  ditweets.tools import sendmail2
 import sys
 import json
@@ -133,6 +134,18 @@ def require_basicauth(f):
         return f(*args,**kwargs)
     return decorated_function
 
+def is_admin(f):
+    @wraps(f)
+    def decorated_function(*args,**kwargs):
+        if 'id' in session and session['id']['username'] in admins:
+            return f(*args,**kwargs)
+        else:
+            return redirect('/')
+
+    return decorated_function
+
+
+
 from passlib.hash import pbkdf2_sha256
 import pickle
 
@@ -166,6 +179,24 @@ class Auth:
         hash = pbkdf2_sha256.encrypt(password, rounds=200000, salt_size=16)
         return open(os.path.join(userdir,'passwd'),'w').write(hash)
 
+    def get_file(self,username,filename):
+        userdir = self.get_dir(username)
+        path = os.path.join(userdir,filename)
+        if os.path.exists(path):
+            return pickle.load(open(path,'rb'))
+        else:
+            return None
+
+    def set_file(self,username,filename,data):
+        userdir = self.get_dir(username)
+        pickle.dump(data,open(os.path.join(userdir,filename),'wb'))
+
+    def update_file(self,username,filename,newdata):
+        data = self.get_file(username,filename)
+        data.update(newdata)
+        self.set_file(username,filename,data)
+
+
     def get_data(self,username):
         userdir = self.get_dir(username)
         return pickle.load(open(os.path.join(userdir,'data'),'rb'))
@@ -173,6 +204,7 @@ class Auth:
     def set_data(self,username,data):
         userdir = self.get_dir(username)
         pickle.dump(data,open(os.path.join(userdir,'data'),'wb'))
+
 
     def init(self,app_path):
         path = os.path.join(app_path,'users')
@@ -204,7 +236,9 @@ class Auth:
 
     def users_data(self):
         for user in os.listdir(self.path):
-            yield self.get_data(user)
+            data = self.get_data(user)
+            data.update(username=user)
+            yield data
 
 
 

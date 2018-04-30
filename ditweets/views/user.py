@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ditweets import app, cache, accounts
-from ditweets.auth import require_login, auth
+from ditweets.auth import require_login, auth, is_admin
 from flask import render_template, request, session, redirect
 import json
 
@@ -12,16 +12,74 @@ import json
 from ditweets.controllers.twitter import twitter_job, twitterAccount
 from ditweets.controllers.imports import gsheet_twitter
 @app.route('/forcereload')
+@is_admin
 def forcereload():
     gsheet_twitter()
-    return "ok"
+    return redirect('/')
 
+@app.route('/stats')
+@require_login(redir='stats')
+def stats():
+    username = session['id']['username']
+    data = auth.get_file(username,'stats')
+    print(data)
+    return "ok"
 
 @app.route('/forcetask')
+@is_admin
 def forcetask():
     twitter_job()
-    return "ok"
+    return redirect('/')
 
+from ditweets.controllers.actions import add_action, del_action, update_action, get_action, get_actions
+
+@app.route('/del_action/<action_id>')
+def view_del_action(action_id):
+    del_action(action_id)
+    return redirect('/actions')
+
+@app.route('/action_tweet',methods=['POST','GET'])
+@app.route('/action_tweet/<action_id>',methods=['POST','GET'])
+def action_tweet(action_id=None):
+    if request.method=='GET':
+        action = get_action(action_id) if action_id else {}
+        return render_template('action_tweet.html',action_id=action_id,**action)
+    elif request.method=='POST':
+        actions = []
+        if request.form.get('like'):
+            actions.append('like')
+        if request.form.get('rt'):
+            actions.append('rt')
+        tweet_id = request.form.get('tweet_id')
+        action = {'duration': int(request.form.get('duration')),
+                'actions': actions,
+              'tweet_id': tweet_id,
+              'number': int(request.form.get('number')),
+              'start': request.form.get('start')
+              }
+        data = auth.get_data(session['id']['username'])
+        api = twitterAccount(data)
+        action_id = request.form.get('action_id')
+        try:
+            tweet = api.GetStatus(status_id = tweet_id)
+            action['tweet_text'] = tweet.text
+            action['user'] = tweet.user.name
+            #<a href="https://twitter.com/statuses/{{ action['tweet_id'] }}">{{ action['tweet_text'] }}</a>
+            action['screenname'] = tweet.user.screen_name
+            action['user_image'] = tweet.user.profile_image_url
+            if action_id:
+                update_action(action_id,action)
+            else:
+                id = add_action(action)
+            return redirect('/actions')
+        except:
+            return render_template('action_tweet.html', action_id=action_id, **action, tweet_error=True)
+
+@app.route('/actions')
+def view_actions():
+    actions = sorted([ action for action in get_actions().values()], key=lambda x:x['start'], reverse = True)
+    print(actions)
+    return render_template('actions.html', actions=actions)
 
 @app.route('/test')
 def test():
@@ -31,11 +89,12 @@ def test():
     tapi = twitterAccount(data)
     tweets = tapi.GetUserTimeline(screen_name="Action_Insoumis",count=30)
     for t in tweets:
-        
+
             print(t)
         #if t.id == 990346844218757120:
         #    print(t)
     return "ok"
+
 @app.route('/')
 @require_login(redir='root')
 def root():

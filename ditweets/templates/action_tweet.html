@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.spacer {
+  margin-top:100px;
+}
+.cbutton {
+  min-width:2em;
+}
+.cbutton input:checked + span {
+  background-color: #00d1b2;
+  color: white;
+}
+</style>
+<section class="container">
+<form id="action_tweet" action="action_tweet" method="post">
+<div class="spacer"></div>
+<h3 class="title">{% if action_id %}Modifier{% else %}Nouvelle{% endif %} action</h3>
+{% if action_id %}<input type="hidden" name="action_id" value="{{ action_id }}">{% endif %}
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Tweet ID</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="tweet_id" class="input" type="text" placeholder="ex: 99877845454124" {% if tweet_id %}value="{{tweet_id}}"{% endif %}required>
+      </div>
+      {% if tweet_error %}<p class="help is-danger">ID non valide</p>{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Actions</label>
+  </div>
+  <div class="field-body">
+    <span class="cbutton">
+     <label>
+        <input name="rt" type="checkbox" {% if 'rt' in actions %}checked{% endif%} hidden><span class="button"><i class="fas fa-retweet"></i></span>
+     </label>
+    </span>
+    <span class="cbutton">
+    <label>
+      <input name="like" type="checkbox" {% if 'like' in actions %}checked{% endif%} hidden><span class="button"><i class="fas fa-heart"></i></span>
+    </label>
+    </span>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Nombre</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="number" class="input" type="number" min="1" max="100" placeholder="de 1 à 100" {% if number %}value="{{number}}"{% endif %} required>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Début</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="start" type="datetime-local" class="input" {% if start %}value="{{start}}"{% endif %} required>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+  <div class="field-label">
+    <label class="label">Durée</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="duration" type="number" placeholder="de 5 a 240 min" class="input" min="5" max="240" step="5" {% if duration %}value="{{duration}}"{% endif %} required>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="field is-horizontal">
+  <div class="field-label">
+    <!-- Left empty for spacing -->
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input type="submit" class="button is-primary" value="Valider">
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+<div class="spacer"></div>
+
+</section>
+
+{% endblock %}

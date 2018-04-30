@@ -4,4 +4,5 @@ config_private.py
 logs*.html
 *.wsgi
 users/
+actions/
 __pycache__/

@@ -18,6 +18,7 @@ def getTwitterData(api):
     # Recuperation ID Tweets, RT et Likes des comptes paramétrés
     params = {}
     lastId = cache.get('tweeter_last_id',0)
+    lastId = 990230265426563077
     if lastId:
         params['since_id'] = lastId
     else:
@@ -25,7 +26,6 @@ def getTwitterData(api):
     maxId = lastId
 
     for account in get_accounts_list(cache['comptes']):
-        print(account)
         twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**params), 'retweets':[], 'tweets':[],'replies':[]}
         maxId = max([t.id for t in twitter_ids[account]['likes']]+[maxId])
         for tweet in api.GetUserTimeline(screen_name=account,**params):
@@ -64,15 +64,28 @@ def twitter_job():
                 for it in actions[do]:
                     for tweet in twitter_ids.get(account,{}).get(it,[]):
                         todo[do][tweet.id] = 1
-
+        retweets = 0
+        likes = 0
         for id in todo['rt'].keys():
             try:
                 api.PostRetweet(status_id=id,trim_user=True)
+                retweets += 1
             except:
                 pass
         for id in todo['like'].keys():
             try:
                 api.CreateFavorite(status_id=id, include_entities=False)
+                likes += 1
             except:
                 pass
+        update_user_stats(data['username'],retweets=retweets,likes=likes)
     return 'ok'
+
+def get_user_stats():
+    pass
+
+def update_user_stats(user,likes=0,retweets=0,bot=0):
+    stats = auth.get_file(user,'stats') or {}
+    stats['likes'] = stats.get('likes',0) + likes
+    stats['retweets'] = stats.get('retweets',0) + retweets
+    auth.set_file(user,'stats',stats)

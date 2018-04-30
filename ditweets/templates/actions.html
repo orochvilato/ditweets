@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.cbutton {
+  min-width:2em;
+}
+.cbutton input:checked + span {
+  background-color: #00d1b2;
+  color: white;
+}
+.sticky {
+  margin: 0;
+  padding: 2px 0 0 12px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 40px;
+}
+.avatar {
+  width: 48px;
+
+height: 48px;
+border-radius: 50%;
+padding-right:4px;
+}
+.username {
+  font-size: 18px;
+  color: black;
+  white-space: nowrap;
+  font-weight: bold;
+  text-decoration: none;
+  line-height: 1;
+  padding-right:10px;
+}
+.screenname {
+  font-size: 14px;
+  font-weight: normal;
+
+  color: #657786;
+  line-height: 1;
+}
+.message {
+  text-decoration: none;
+  color: black;
+  font-size:14px;
+  font-weight: normal;
+}
+.has-text-selected {
+  font-weight: 600;
+  color: #209cee;
+}
+.tweet {
+  display:flex;
+}
+.table {
+  vertical-align:middle;
+}
+</style>
+<section class="container content">
+
+  <h1 style="padding-top:30px;">Actions <a href="/action_tweet" class="button is-primary"><i><i class="fas fa-plus"></i></a></h1>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Action</th>
+        <th>Tweet</th>
+        <th>Nombre</th>
+        <th>Debut</th>
+        <th>Durée</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for action in actions %}
+      <tr>
+        <td>{% if 'rt' in action['actions'] %}<i class="fas fa-retweet has-text-info"></i>{% endif %}
+          {% if 'like' in action['actions'] %}<i class="fas fa-heart has-text-info"></i>{% endif %}
+        </td>
+        <td><a class="tweet"><img class="avatar" src="{{ action['user_image']}}">
+          <span>
+            <span class="username">{{ action['user'] }}</span><br>
+            <span class="screenname">@{{ action['screenname']}}</span>
+          </span><span class="message">{{ action['tweet_text'] }}</span></a></td>
+        <td>{{ action['number'] }}</td>
+        <td nowrap>{{ action['start'] }}</td>
+        <td nowrap>{{ action['duration'] }} min</td>
+        <td nowrap>
+          <a href="/action_tweet/{{ action['id']}}"><i class="fas fa-edit has-text-primary"></i></a>
+          <a href="/del_action/{{ action['id']}}"><i class="fas fa-trash-alt has-text-primary"></i></a>
+        </td>
+      </tr>
+     {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% endblock %}

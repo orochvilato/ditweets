@@ -4,7 +4,7 @@ from .config_private import smtp,privatekey
 
 import locale
 locale.setlocale(locale.LC_ALL, 'fr_FR.utf8')
-
+admins = ["oro","SraM"]
 from .auth import AUTH,require_login
 from flask import Flask
 from flask_cors import CORS
@@ -14,7 +14,7 @@ CORS(app)
 import os.path
 #@Action_Insoumis @InstantEnCommun @Obs_Democratie @RadioInsoumise  @LAEC_fr @Fiscal_Kombat ‏@FAQdeLAEC ‏@elonmusk @Macroverdose @worldtvdesinfo @InstitutOPIF @le_firagot @LeDeconex ‏@GocheOuDrouate ‏@melenshack @postbadjeanluc#5511 ‏@RuffinDebout ‏@Fakir_ ‏@PicardieDebout ‏@LeMediaTV @InsoumisJeunes  @FranceInsoumise ‏ @JLMelenchon
 accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis",'worldtvdesinfo','InstitutOPIF','LeMediaTV']
-admins = ["oro","SraM"]
+
 app.secret_key = privatekey
 app.app_path = '/'.join(os.path.abspath(__file__).split('/')[:-2])
 AUTH(app)
