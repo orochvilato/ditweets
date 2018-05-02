@@ -51,6 +51,7 @@ def view_del_action(action_id):
 
 @app.route('/action_tweet',methods=['POST','GET'])
 @app.route('/action_tweet/<action_id>',methods=['POST','GET'])
+@require_login('/action_tweet')
 def action_tweet(action_id=None):
     if request.method=='GET':
         action = get_action(action_id) if action_id else {}
