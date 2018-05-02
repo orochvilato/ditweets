@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
+<link rel="stylesheet" type="text/css" id="editor-theme" href="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.css">
+
 <style>
 .spacer {
   margin-top:100px;
@@ -25,7 +27,8 @@
 </style>
 
 
-
+<!-- https://github.com/mervick/emojionearea -->
+<!-- https://fineuploader.com/demos.html -->
 
 <section class="container content">
 <form id="action" action="action" method="post">
@@ -93,7 +96,7 @@
   <div class="field-body">
     <div class="field">
       <div class="control">
-        <textarea name="tweet_content" class="textarea" placeholder="Contenu du tweet"></textarea>
+        <textarea name="tweet_content" class="textarea tweet_content" placeholder="Contenu du tweet"></textarea>
       </div>
     </div>
   </div>
@@ -185,6 +188,8 @@
 <div class="spacer"></div>
 
 </section>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script>
 <script>
   function set_value(evt) {
     var e = evt.currentTarget;
@@ -197,6 +202,12 @@
     console.log(x[i]);
     x[i].onchange = set_value;
   }
+
+  $(".tweet_content").emojioneArea({
+  pickerPosition: "bottom",
+  filtersPosition: "bottom",
+  tonesStyle: "square"
+});
 </script>
 
 {% endblock %}
