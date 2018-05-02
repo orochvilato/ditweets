@@ -33,6 +33,17 @@ def forcetask():
 
 from ditweets.controllers.actions import add_action, del_action, update_action, get_action, get_actions
 
+
+@app.route('/queue')
+def test_queue():
+    from ditweets.controllers.tasks import q
+    import random
+    for j in range(100):
+        id = "%02d" % j
+        for i,a in enumerate(range(random.randrange(1,10))):
+            q.put({'id':id,'item':i})
+
+
 @app.route('/del_action/<action_id>')
 def view_del_action(action_id):
     del_action(action_id)
@@ -43,7 +54,7 @@ def view_del_action(action_id):
 def action_tweet(action_id=None):
     if request.method=='GET':
         action = get_action(action_id) if action_id else {}
-        return render_template('action_tweet.html',action_id=action_id,**action)
+        return render_template('action.html',action_id=action_id,**action)
     elif request.method=='POST':
         actions = []
         if request.form.get('like'):
