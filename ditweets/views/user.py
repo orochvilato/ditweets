@@ -49,6 +49,10 @@ def view_del_action(action_id):
     del_action(action_id)
     return redirect('/actions')
 
+@app.route('/tweet_edit', methods=['POST','GET'])
+def edit_tweet(tweet_id=None):
+    return render_template('tweet_edit.html')
+
 @app.route('/action_tweet',methods=['POST','GET'])
 @app.route('/action_tweet/<action_id>',methods=['POST','GET'])
 @require_login('/action_tweet')
