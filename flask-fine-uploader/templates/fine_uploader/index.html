@@ -125,11 +125,12 @@
                     notAvailablePath: '/source/placeholders/not_available-generic.png'
                 }
             },
-            autoUpload: false
+            autoUpload: true
         });
 
         $('#trigger-upload').click(function() {
             $('#fine-uploader-manual-trigger').fineUploader('uploadStoredFiles');
+            console.log($('#fine-uploader-manual-trigger').fineUploader('getUploads'));
         });
     </script>
 </body>

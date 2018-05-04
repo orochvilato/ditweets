@@ -84,4 +84,4 @@ jobs.start_scheduler()
 
 
 
-from .views import user
+from .views import user, upload

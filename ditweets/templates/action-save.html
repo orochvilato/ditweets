@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" type="text/css" id="editor-theme" href="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.css">
+
+<style>
+.spacer {
+  margin-top:100px;
+}
+.cbutton {
+  min-width:2em;
+}
+.cbutton input:checked + span {
+  background-color: #00d1b2;
+  color: white;
+}
+#tweet_type[value="Nouveau"] ~ #tweet_id {
+  display: none;
+  visibility: hidden;
+}
+#tweet_type[value="Existant"] ~ #tweet_content {
+  display: none;
+  visibility: hidden;
+}
+
+
+}
+</style>
+
+
+<!-- https://github.com/mervick/emojionearea -->
+<!-- https://fineuploader.com/demos.html -->
+
+<section class="container content">
+<form id="action" action="action" method="post">
+<div class="spacer1"></div>
+<h1>{% if action_id %}Modifier{% else %}Nouvelle{% endif %} opération</h1>
+{% if action_id %}<input type="hidden" name="action_id" value="{{ action_id }}">{% endif %}
+<hr>
+<h3>Objet</h3>
+<!-- RT/Like -->
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Actions</label>
+  </div>
+  <div class="field-body">
+    <span class="cbutton">
+     <label>
+        <input name="rt" type="checkbox" {% if 'rt' in actions %}checked{% endif%} hidden><span class="button"><i class="fas fa-retweet"></i></span>
+     </label>
+    </span>
+    <span class="cbutton">
+    <label>
+      <input name="like" type="checkbox" {% if 'like' in actions %}checked{% endif%} hidden><span class="button"><i class="fas fa-heart"></i></span>
+    </label>
+    </span>
+  </div>
+</div>
+
+<!-- Tweet Type -->
+
+<div id="tweet_type" class="field is-horizontal" value="Nouveau">
+  <div class="field-label is-normal">
+    <label class="label">Tweet</label>
+  </div>
+  <div class="field-body">
+    <div class="select">
+      <select name="tweet_type">
+        <option>Nouveau</option>
+        <option>Existant</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Tweet ID -->
+<div id="tweet_id" class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Tweet ID</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="tweet_id" class="input" type="text" placeholder="ex: 99877845454124" {% if tweet_id %}value="{{tweet_id}}"{% endif %}required>
+      </div>
+      {% if tweet_error %}<p class="help is-danger">ID non valide</p>{% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Tweet Content -->
+<div id="tweet_content" class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Contenu</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <textarea name="tweet_content" class="textarea tweet_content" placeholder="Contenu du tweet"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+<h3>Programmation<h3>
+
+<!-- Start -->
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Début</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="start" type="datetime-local" class="input" {% if start %}value="{{start}}"{% endif %} required>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Duration -->
+<div class="field is-horizontal">
+  <div class="field-label">
+    <label class="label">Durée</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input name="duration" type="number" placeholder="de 5 a 240 min" class="input" min="5" max="240" step="5" {% if duration %}value="{{duration}}"{% endif %} required>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+<h3>Déroulement</h3>
+
+<!-- account_selection -->
+<div id="account_selection" class="field is-horizontal" value="Aléatoire">
+  <div class="field-label is-normal">
+    <label class="label">Choix des comptes</label>
+  </div>
+  <div class="field-body">
+    <div class="select">
+      <select name="diffusion">
+        <option>Aléatoire</option>
+        <option>Nombre d'abonnés décroissant</option>
+        <option>Nombre d'abonnés croissant</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+
+<!-- Diffusion -->
+<div id="diffusion" class="field is-horizontal" value="Linéaire">
+  <div class="field-label is-normal">
+    <label class="label">Diffusion</label>
+  </div>
+  <div class="field-body">
+    <div class="select">
+      <select name="diffusion">
+        <option>Linéaire</option>
+        <option>Logarithmique</option>
+        <option>Exponentielle</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+
+<!--
+<div class="field is-horizontal">
+  <div class="field-label">
+
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input type="submit" class="button is-primary" value="Valider">
+      </div>
+    </div>
+  </div>
+</div>
+-->
+</form>
+<div class="spacer"></div>
+
+</section>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script>
+<script>
+  function set_value(evt) {
+    var e = evt.currentTarget;
+    var field = document.getElementById(e.name);
+    field.setAttribute('value',e.value);
+  }
+  var x = document.getElementsByTagName('select');
+  var i;
+  for (i = 0; i < x.length; i++) {
+    console.log(x[i]);
+    x[i].onchange = set_value;
+  }
+
+  $(".tweet_content").emojioneArea({
+  pickerPosition: "bottom",
+  filtersPosition: "bottom",
+  tonesStyle: "square"
+});
+</script>
+
+{% endblock %}
