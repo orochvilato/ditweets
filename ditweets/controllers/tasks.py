@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ditweets.auth import auth
 from queue import Queue
 from threading import Thread
 from time import sleep
@@ -8,48 +9,59 @@ nbworkers = 8
 
 
 import subprocess
+import twitter
 
-def ffmpeg(*cmd):
-	try:
-		subprocess.check_output(['ffmpeg'] + list(cmd))
-	except subprocess.CalledProcessError:
-		return False
+def get_user_stats():
+    pass
 
-	return True
-
-def make_thumb(video_filename):
-	# pad with black if W<H, crop to center if W>H, rescale to 300x300 if greater
+def update_user_stats(user,likes=0,retweets=0,bot=0):
+    stats = auth.get_file(user,'stats') or {}
+    stats['likes'] = stats.get('likes',0) + likes
+    stats['retweets'] = stats.get('retweets',0) + retweets
+    auth.set_file(user,'stats',stats)
 
 
-	ff_filters = (f.replace(',', '\\,') for f in (
-		'pad=if(lt(iw,ih),ih,iw):ih:if(lt(iw,ih),(ih-iw)/2,0):0:black',
-		'crop=ih:ih:(iw-ih)/2:0',
-		'scale=if(lt(iw,300),iw,300):if(lt(iw,300),iw,300)',
-	))
-	ff_filterstr = ','.join(ff_filters)
+def dotask(userdata,todo):
+	from ditweets.controllers.twitter import twitterAccount
+	api = twitterAccount(userdata)
+	print("go")
+	retweets = 0
+	likes = 0
 
-	thumb_path = video_filename + '.thumb.jpg'
-	ffmpeg('-y', '-vf', ff_filterstr,
-		'-vframes', '1', thumb_path,
-		'-i', video_filename)
+	for id in todo['rt'].keys():
+		try:
+			time.sleep(random.random()/2)
+			api.PostRetweet(status_id=id,trim_user=True)
+			retweets += 1
+
+		except Exception as err:
+			pass
+		    #print(err.message)
+		    #for i in err.message:
+		    #    print(i)
+
+			#print(err.args[0][0]['code'])
+
+
+	for id in todo['like'].keys():
+		try:
+			api.CreateFavorite(status_id=id, include_entities=False)
+			likes += 1
+		except Exception as err:
+			pass
+		    #print(err.message)
+		    #for i in err.message:
+		    #    print(i)
+
+
+	update_user_stats(userdata['username'],retweets=retweets,likes=likes)
 
 def worker(n):
-    while True:
-        item = q.get()
-        retries = 3
-        while retries>0:
-            try:
-                sleep(0.1+random.random())
-                print('worker %d' % n,item)
-                retries = -1
-            except:
-                retries -= 1
-
-        if retries>=0:
-            pass
-            #states[item['key']] = {'etat':u'Erreur','avancement':-1}
-        print('done',retries)
-        q.task_done()
+	while True:
+		item = q.get()
+		print('worker %d' % n,item)
+		dotask(**item)
+		q.task_done()
 
 
 

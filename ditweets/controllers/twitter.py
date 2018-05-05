@@ -4,6 +4,9 @@ from ditweets import cache
 from ditweets.auth import require_login, auth
 from ditweets.tools import get_accounts_list
 
+from ditweets.controllers.tasks import q as qtwitter
+
+
 def twitterAccount(data):
     import twitter
     api = twitter.Api(consumer_key=data.get('twitter_consumer_key','nope'),
@@ -18,11 +21,10 @@ def getTwitterData(api):
     # Recuperation ID Tweets, RT et Likes des comptes paramétrés
     params = {}
     lastId = cache.get('tweeter_last_id',0)
-    lastId = 990230265426563077
     if lastId:
         params['since_id'] = lastId
     else:
-        params['count'] = 1
+        params['count'] = 3
     maxId = lastId
 
     for account in get_accounts_list(cache['comptes']):
@@ -46,6 +48,7 @@ def getTwitterData(api):
 import json
 def twitter_job():
     twitter_ids = {}
+    print('twitter_job')
     for data in auth.users_data():
         if not data.get('twitter_success',False):
             continue
@@ -55,6 +58,7 @@ def twitter_job():
 
         todo = {'rt':{},'like':{}}
         for account in get_accounts_list(cache['comptes']):
+
             actions = {'like':[],'rt':[]}
             for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like'),('replies','rt'),('replies','like')]:
                 item = "{account}_{item}_{action}".format(account=account, item=_item, action=_action)
@@ -66,19 +70,10 @@ def twitter_job():
                         todo[do][tweet.id] = 1
         retweets = 0
         likes = 0
-        for id in todo['rt'].keys():
-            try:
-                api.PostRetweet(status_id=id,trim_user=True)
-                retweets += 1
-            except:
-                pass
-        for id in todo['like'].keys():
-            try:
-                api.CreateFavorite(status_id=id, include_entities=False)
-                likes += 1
-            except:
-                pass
-        update_user_stats(data['username'],retweets=retweets,likes=likes)
+
+        qtwitter.put({'userdata':data,'todo':todo})
+
+
     return 'ok'
 
 def get_user_stats():

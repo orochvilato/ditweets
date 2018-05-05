@@ -240,7 +240,11 @@ class Auth:
             data = self.get_data(user)
             data.update(username=user)
             yield data
-
+    def user_log(self,username,log):
+        userdir = self.get_dir(username)
+        logpath = os.path.join(userdir,'log')
+        with open(logpath,'w+') as f:
+            f.write(log)
 
 
 auth = Auth()
