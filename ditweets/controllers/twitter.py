@@ -21,16 +21,21 @@ def getTwitterData(api):
     # Recuperation ID Tweets, RT et Likes des comptes paramétrés
     params = {}
     lastId = cache.get('tweeter_last_id',0)
+    #lastId = 992788759014985727
     if lastId:
         params['since_id'] = lastId
     else:
         params['count'] = 3
+
+
+
     maxId = lastId
 
-    for account in get_accounts_list(cache['comptes']):
+    for account in ['Deputee_Obono']: #get_accounts_list(cache['comptes']):
         twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**params), 'retweets':[], 'tweets':[],'replies':[]}
         maxId = max([t.id for t in twitter_ids[account]['likes']]+[maxId])
         for tweet in api.GetUserTimeline(screen_name=account,**params):
+            print(tweet)
             if tweet.in_reply_to_screen_name:
                 twitter_ids[account]['replies'].append(tweet)
             elif tweet.retweeted_status:
@@ -43,6 +48,7 @@ def getTwitterData(api):
         #twitter_ids[account]['tweets'] =
         #twitter_ids[account]['retweets'] = api.GetRetweets(screen_name=account,**params)
     cache['tweeter_last_id'] = maxId
+    
     return twitter_ids
 
 import json

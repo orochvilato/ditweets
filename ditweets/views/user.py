@@ -112,7 +112,7 @@ def test():
     return "ok"
 
 @app.route('/')
-@require_login(redir='root')
+@require_login(redir='')
 def root():
     username = session['id']['username']
     data = auth.get_data(username)

@@ -28,19 +28,6 @@ def dotask(userdata,todo):
 	retweets = 0
 	likes = 0
 
-	for id in todo['rt'].keys():
-		try:
-			time.sleep(random.random()/2)
-			api.PostRetweet(status_id=id,trim_user=True)
-			retweets += 1
-
-		except Exception as err:
-			pass
-		    #print(err.message)
-		    #for i in err.message:
-		    #    print(i)
-
-			#print(err.args[0][0]['code'])
 
 
 	for id in todo['like'].keys():
@@ -49,9 +36,24 @@ def dotask(userdata,todo):
 			likes += 1
 		except Exception as err:
 			pass
-		    #print(err.message)
+			print(err.message)
 		    #for i in err.message:
 		    #    print(i)
+
+	for id in todo['rt'].keys():
+		try:
+			sleep(random.random()/2)
+			api.PostRetweet(status_id=id,trim_user=True)
+			retweets += 1
+
+		except Exception as err:
+			pass
+			print(err.message)
+		    #for i in err.message:
+		    #    print(i)
+
+			#print(err.args[0][0]['code'])
+
 
 
 	update_user_stats(userdata['username'],retweets=retweets,likes=likes)
