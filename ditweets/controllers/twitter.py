@@ -20,22 +20,34 @@ def getTwitterData(api):
     twitter_ids = {}
     # Recuperation ID Tweets, RT et Likes des comptes paramétrés
     params = {}
+    paramsLike = {}
     lastId = cache.get('tweeter_last_id',0)
+    lastIdLike = cache.get('tweeter_last_id_like',0)
+    lastIdLike = 0
     #lastId = 992788759014985727
     if lastId:
         params['since_id'] = lastId
     else:
-        params['count'] = 3
+        params['count'] = 10
+    if lastIdLike:
+        paramsLike['since_id'] = lastIdLike
+    else:
+        paramsLike['count'] = 10
 
 
 
     maxId = lastId
+    maxIdLike = lastIdLike
 
     for account in ['Deputee_Obono']: #get_accounts_list(cache['comptes']):
-        twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**params), 'retweets':[], 'tweets':[],'replies':[]}
-        maxId = max([t.id for t in twitter_ids[account]['likes']]+[maxId])
+        # une valeur par compte
+        twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**paramsLike), 'retweets':[], 'tweets':[],'replies':[]}
+        for like in twitter_ids[account]['likes']:
+            print(like.id,like.created_at)
+        1/0
+        maxIdLike = max([t.id for t in twitter_ids[account]['likes']]+[maxIdLike])
+
         for tweet in api.GetUserTimeline(screen_name=account,**params):
-            print(tweet)
             if tweet.in_reply_to_screen_name:
                 twitter_ids[account]['replies'].append(tweet)
             elif tweet.retweeted_status:
@@ -48,7 +60,8 @@ def getTwitterData(api):
         #twitter_ids[account]['tweets'] =
         #twitter_ids[account]['retweets'] = api.GetRetweets(screen_name=account,**params)
     cache['tweeter_last_id'] = maxId
-    
+    cache['tweeter_last_id_like'] = maxIdLike
+
     return twitter_ids
 
 import json

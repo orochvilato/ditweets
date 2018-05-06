@@ -29,9 +29,10 @@ def dotask(userdata,todo):
 	likes = 0
 
 
-
+	print('likes',len(todo['like']))
 	for id in todo['like'].keys():
 		try:
+			sleep(random.random()/2)
 			api.CreateFavorite(status_id=id, include_entities=False)
 			likes += 1
 		except Exception as err:
@@ -40,6 +41,7 @@ def dotask(userdata,todo):
 		    #for i in err.message:
 		    #    print(i)
 
+	print('rt',len(todo['rt']))
 	for id in todo['rt'].keys():
 		try:
 			sleep(random.random()/2)
