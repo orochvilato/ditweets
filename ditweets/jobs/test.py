@@ -1,8 +1,8 @@
 definition = dict(
     name = __name__,
-    active = False,
+    active = True,
     type = 'cron',
-    params = dict(minute='*/20'),
+    params = dict(minute='*/30'),
     description = "Test",
     notify_error = ['observatoireapi@yahoo.com']
     )
