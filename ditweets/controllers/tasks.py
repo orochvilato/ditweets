@@ -22,43 +22,38 @@ def update_user_stats(user,likes=0,retweets=0,bot=0):
 
 
 def dotask(userdata,todo):
-	from ditweets.controllers.twitter import twitterAccount
-	api = twitterAccount(userdata)
-	print("go")
-	retweets = 0
-	likes = 0
+    from ditweets.controllers.twitter import twitterAccount
+    from ditweets import mdb, mdbrw
 
+    api = twitterAccount(userdata)
+    print("go")
+    # RECHERCHER LE SCREENNAME DU COMPTE
+    maxId = mdb.tweets.find().sort("id",-1).limit(1)
+    maxId = maxId[0]['id'] if maxId else 0
+    print('likes',len(todo['like']))
+    for id in todo['like'].keys():
+        #if id<=maxId:
+        #    continue
+        try:
+            sleep(random.random()/2)
+            api.CreateFavorite(status_id=id, include_entities=False)
+            mdbrw.logs.insert_one({'username':userdata['username'],'action':'like','tweet_id':id})
+        except Exception as err:
+            pass
+            print(err.message)
 
-	print('likes',len(todo['like']))
-	for id in todo['like'].keys():
-		try:
-			sleep(random.random()/2)
-			api.CreateFavorite(status_id=id, include_entities=False)
-			likes += 1
-		except Exception as err:
-			pass
-			print(err.message)
-		    #for i in err.message:
-		    #    print(i)
-
-	print('rt',len(todo['rt']))
-	for id in todo['rt'].keys():
-		try:
-			sleep(random.random()/2)
-			api.PostRetweet(status_id=id,trim_user=True)
-			retweets += 1
-
-		except Exception as err:
-			pass
-			print(err.message)
-		    #for i in err.message:
-		    #    print(i)
-
-			#print(err.args[0][0]['code'])
-
-
-
-	update_user_stats(userdata['username'],retweets=retweets,likes=likes)
+    print('rt',len(todo['rt']))
+    for id in todo['rt'].keys():
+        #if id<=maxId:
+        #    continue
+        try:
+            sleep(random.random()/2)
+            api.PostRetweet(status_id=id,trim_user=True)
+            mdbrw.logs.insert_one({'username':userdata['username'],'action':'rt','tweet_id':id})
+        except Exception as err:
+            pass
+            print(err.message)
+    print("done")
 
 def worker(n):
 	while True:

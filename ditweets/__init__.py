@@ -11,9 +11,19 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+import pymongo
+from .config_private import mongo_read_user,mongo_read_password,mongo_write_user,mongo_write_password,smtp
+
+client = pymongo.MongoClient('mongodb://%s:%s@ditweets.orvdev.fr:27017/ditweets' %(mongo_read_user,mongo_read_password))
+mdb = client.ditweets
+
+clientrw = pymongo.MongoClient('mongodb://%s:%s@ditweets.orvdev.fr:27017/ditweets' %(mongo_write_user,mongo_write_password))
+mdbrw = clientrw.ditweets
+
+
 import os.path
 #@Action_Insoumis @InstantEnCommun @Obs_Democratie @RadioInsoumise  @LAEC_fr @Fiscal_Kombat ‏@FAQdeLAEC ‏@elonmusk @Macroverdose @worldtvdesinfo @InstitutOPIF @le_firagot @LeDeconex ‏@GocheOuDrouate ‏@melenshack @postbadjeanluc#5511 ‏@RuffinDebout ‏@Fakir_ ‏@PicardieDebout ‏@LeMediaTV @InsoumisJeunes  @FranceInsoumise ‏ @JLMelenchon
-accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis",'worldtvdesinfo','InstitutOPIF','LeMediaTV']
+#accounts = ['Francois_Ruffin',"InstantEnCommun","Action_Insoumis",'worldtvdesinfo','InstitutOPIF','LeMediaTV']
 
 app.secret_key = privatekey
 app.app_path = '/'.join(os.path.abspath(__file__).split('/')[:-2])

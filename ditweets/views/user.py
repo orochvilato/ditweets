@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from ditweets import app, cache, accounts
+from ditweets import app, cache
 from ditweets.auth import require_login, auth, is_admin
 from flask import render_template, request, session, redirect
 import json
-
 
 
 
@@ -30,6 +29,14 @@ def stats():
 def forcetask():
     twitter_job()
     return redirect('/')
+
+from ditweets.controllers.twitter import twitterAccount, getTwitterData, twitter_job
+from ditweets.config_private import twitter_fetch
+@app.route('/newt')
+def newt():
+    #api = twitterAccount(twitter_fetch)
+    #getTwitterData(api)
+    twitter_job()
 
 from ditweets.controllers.actions import add_action, del_action, update_action, get_action, get_actions
 
@@ -126,7 +133,7 @@ def root():
 def param():
     username = session['id']['username']
     data = auth.get_data(username)
-    return render_template('param.html',session=session,accounts=accounts,comptes=cache['comptes'],params=data.get('params',{}))
+    return render_template('param.html',session=session,comptes=cache['comptes'],params=data.get('params',{}))
 
 @app.route('/config')
 @require_login(redir='config')

@@ -1,79 +1,97 @@
 # -*- coding: utf-8 -*-
 
-from ditweets import cache
+from ditweets import cache,mdb, mdbrw
 from ditweets.auth import require_login, auth
 from ditweets.tools import get_accounts_list
 
 from ditweets.controllers.tasks import q as qtwitter
-
+from ditweets.config_private import twitter_fetch
 
 def twitterAccount(data):
     import twitter
     api = twitter.Api(consumer_key=data.get('twitter_consumer_key','nope'),
                       consumer_secret=data.get('twitter_consumer_secret','nope'),
                       access_token_key=data.get('twitter_access_token','nope'),
-                      access_token_secret=data.get('twitter_access_token_secret','nope'))
+                      access_token_secret=data.get('twitter_access_token_secret','nope'),
+                      sleep_on_rate_limit=True)
     return api
 
+def getTweet(item):
+    return {
+        'id':item.id,
+        'created_at':item.created_at,
+        'user':{
+            'screen_name':item.user.screen_name,
+            'name':item.user.name,
+            'profile_image_url':item.user.profile_image_url
+        },
+
+        'text':item.text,
+     }
+
+def getMaxId():
+    maxId = mdb.tweets.find().sort("id",-1).limit(1)
+    return maxId[0]['id'] if maxId else 0
 
 def getTwitterData(api):
-    twitter_ids = {}
-    # Recuperation ID Tweets, RT et Likes des comptes paramétrés
     params = {}
-    paramsLike = {}
-    lastId = cache.get('tweeter_last_id',0)
-    lastIdLike = cache.get('tweeter_last_id_like',0)
-    lastIdLike = 0
-    #lastId = 992788759014985727
-    if lastId:
-        params['since_id'] = lastId
+    maxId = mdb.tweets.find().sort("id",-1).limit(1)
+    if maxId:
+        maxId = maxId[0]['id']
+        params['since_id'] = maxId
     else:
         params['count'] = 10
-    if lastIdLike:
-        paramsLike['since_id'] = lastIdLike
-    else:
-        paramsLike['count'] = 10
 
-
-
-    maxId = lastId
-    maxIdLike = lastIdLike
-
-    for account in ['Deputee_Obono']: #get_accounts_list(cache['comptes']):
-        # une valeur par compte
-        twitter_ids[account] = {'likes':api.GetFavorites(screen_name=account,**paramsLike), 'retweets':[], 'tweets':[],'replies':[]}
-        for like in twitter_ids[account]['likes']:
-            print(like.id,like.created_at)
-        1/0
-        maxIdLike = max([t.id for t in twitter_ids[account]['likes']]+[maxIdLike])
-
-        for tweet in api.GetUserTimeline(screen_name=account,**params):
+    for account in get_accounts_list(cache['comptes']):
+        # likes
+        likes = api.GetFavorites(screen_name=account, **params)
+        like_ids = []
+        for like in likes:
+            like_ids.append(like.id)
+            tweet = getTweet(like)
+            mdbrw.tweets.update({'id':like.id},{'$setOnInsert':tweet},upsert=True)
+        if like_ids:
+            mdbrw.actions.insert_many([dict(screen_name=account,action='like',tweet_id=id) for id in like_ids])
+        items = []
+        for tweet in api.GetUserTimeline(screen_name=account, **params):
+            tw = getTweet(tweet)
+            mdbrw.tweets.update({'id':tweet.id},{'$setOnInsert':tw}, upsert=True)
             if tweet.in_reply_to_screen_name:
-                twitter_ids[account]['replies'].append(tweet)
+                action = "reply"
             elif tweet.retweeted_status:
-                twitter_ids[account]['retweets'].append(tweet)
+                action = "retweet"
             else:
-                twitter_ids[account]['tweets'].append(tweet)
-            maxId = max([maxId,tweet.id])
-        #except:
-        #    pass
-        #twitter_ids[account]['tweets'] =
-        #twitter_ids[account]['retweets'] = api.GetRetweets(screen_name=account,**params)
-    cache['tweeter_last_id'] = maxId
-    cache['tweeter_last_id_like'] = maxIdLike
+                action = "tweet"
 
-    return twitter_ids
+            items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
+        if items:
+            mdbrw.actions.insert_many(items)
+    return "ok"
 
 import json
 def twitter_job():
+    maxId = mdb.logs.find().sort("tweet_id",-1).limit(1)
+    maxId = maxId[0]['tweet_id'] if maxId else 0
+
+    mdbrw.actions.update_many({'tweet_id':{'$lte':maxId}},{'$set':{'done':True}})
     twitter_ids = {}
-    print('twitter_job')
+    for a in mdb.actions.find({'done':None}):
+        if not a['screen_name'] in twitter_ids.keys():
+            twitter_ids[a['screen_name']] = {'tweets':[],'replies':[],'likes':[],'retweets':[]}
+        #mdbrw.actions.update({'_id':a['_id']},{'$set':{'tweet_id':a['tweed_id']},'$unset':{'tweed_id':0}})
+        if a['action']=='reply':
+            twitter_ids[a['screen_name']]['replies'].append(a['tweet_id'])
+        if a['action']=='like':
+            twitter_ids[a['screen_name']]['likes'].append(a['tweet_id'])
+        if a['action']=='tweet':
+            twitter_ids[a['screen_name']]['tweets'].append(a['tweet_id'])
+        if a['action']=='reply':
+            twitter_ids[a['screen_name']]['retweets'].append(a['tweet_id'])
+            
     for data in auth.users_data():
         if not data.get('twitter_success',False):
             continue
         api = twitterAccount(data)
-        if not twitter_ids:
-            twitter_ids = getTwitterData(api)
 
         todo = {'rt':{},'like':{}}
         for account in get_accounts_list(cache['comptes']):
@@ -86,10 +104,10 @@ def twitter_job():
             for do in ['rt','like']:
                 for it in actions[do]:
                     for tweet in twitter_ids.get(account,{}).get(it,[]):
-                        todo[do][tweet.id] = 1
+                        todo[do][tweet] = 1
         retweets = 0
         likes = 0
-
+        #print(todo)
         qtwitter.put({'userdata':data,'todo':todo})
 
 
