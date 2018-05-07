@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ditweets import app, cache
+from ditweets import app, cache, mdb
 from ditweets.auth import require_login, auth, is_admin
 from flask import render_template, request, session, redirect
 import json
@@ -117,6 +117,15 @@ def test():
         #if t.id == 990346844218757120:
         #    print(t)
     return "ok"
+
+@app.route('/logs')
+@require_login(redir='logs')
+def logs():
+    username = session['id']['username']
+    items = mdb.logs.find({'username':username},{'action':1,'tweet_id':1,'_id':None}).sort('tweet_id',-1)
+    import json
+    return json.dumps(list(items), sort_keys=True, indent=4)
+    return render_template('logs.html',logs=items)
 
 @app.route('/')
 @require_login(redir='')
