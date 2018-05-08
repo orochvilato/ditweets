@@ -11,14 +11,6 @@ nbworkers = 8
 import subprocess
 import twitter
 
-def get_user_stats():
-    pass
-
-def update_user_stats(user,likes=0,retweets=0,bot=0):
-    stats = auth.get_file(user,'stats') or {}
-    stats['likes'] = stats.get('likes',0) + likes
-    stats['retweets'] = stats.get('retweets',0) + retweets
-    auth.set_file(user,'stats',stats)
 
 
 def dotask(userdata,todo):

@@ -81,17 +81,16 @@ def twitter_job():
         #mdbrw.actions.update({'_id':a['_id']},{'$set':{'tweet_id':a['tweed_id']},'$unset':{'tweed_id':0}})
         if a['action']=='reply':
             twitter_ids[a['screen_name']]['replies'].append(a['tweet_id'])
-        if a['action']=='like':
+        elif a['action']=='like':
             twitter_ids[a['screen_name']]['likes'].append(a['tweet_id'])
-        if a['action']=='tweet':
+        elif a['action']=='tweet':
             twitter_ids[a['screen_name']]['tweets'].append(a['tweet_id'])
-        if a['action']=='reply':
+        elif a['action']=='reply':
             twitter_ids[a['screen_name']]['retweets'].append(a['tweet_id'])
-            
+
     for data in auth.users_data():
         if not data.get('twitter_success',False):
             continue
-        api = twitterAccount(data)
 
         todo = {'rt':{},'like':{}}
         for account in get_accounts_list(cache['comptes']):
@@ -105,9 +104,7 @@ def twitter_job():
                 for it in actions[do]:
                     for tweet in twitter_ids.get(account,{}).get(it,[]):
                         todo[do][tweet] = 1
-        retweets = 0
-        likes = 0
-        #print(todo)
+        print(todo)
         qtwitter.put({'userdata':data,'todo':todo})
 
 
