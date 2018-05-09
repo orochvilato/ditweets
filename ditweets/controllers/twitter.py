@@ -35,14 +35,17 @@ def getMaxId():
 
 def getTwitterData(api):
     params = {}
-    maxId = mdb.tweets.find().sort("id",-1).limit(1)
-    if maxId:
-        maxId = maxId[0]['id']
-        params['since_id'] = maxId
-    else:
-        params['count'] = 10
 
     for account in get_accounts_list(cache['comptes']):
+        print(account)
+        maxId = list(mdb.tweets.find({'user.screen_name': account}).sort("id",-1).limit(1))
+
+        if maxId:
+            maxId = maxId[0]['id']
+            params = {'since_id': maxId}
+        else:
+            params = {'count': 10}
+
         # likes
         likes = api.GetFavorites(screen_name=account, **params)
         like_ids = []
@@ -55,6 +58,7 @@ def getTwitterData(api):
         items = []
         for tweet in api.GetUserTimeline(screen_name=account, **params):
             tw = getTweet(tweet)
+            print(account,tw)
             mdbrw.tweets.update({'id':tweet.id},{'$setOnInsert':tw}, upsert=True)
             if tweet.in_reply_to_screen_name:
                 action = "reply"

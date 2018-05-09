@@ -1,6 +1,6 @@
 definition = dict(
     name = __name__,
-    active = True,
+    active = False,
     type = 'cron',
     params = dict(minute='*/30'),
     description = "Test",
