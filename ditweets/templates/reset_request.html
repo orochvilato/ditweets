@@ -22,6 +22,7 @@
                  <div class="field">
                    <div class="control">
                      <input name="username" class="input is-medium" type="text" placeholder="Utilisateur" autofocus="">
+                     {% if unknown %}<p class="help is-danger">Utilisateur inconnu</p>{% endif %}
                    </div>
                  </div>
                  <input type="submit" class="button is-block is-primary is-medium is-fullwidth" value="Envoyer le mail">

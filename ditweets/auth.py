@@ -33,12 +33,12 @@ class ResetRequestView(View):
             uid = str(uuid.uuid4())
             cache.set(uid,username,expire=360)
             data = auth.get_data(username)
+            if not data:
+                return render_template('reset_request.html', unknown=True)
             email = data['email']
             url = request.form.get('domain')+url_for('reset_password', uid=uid)
-            print(url)
-            msg = u"""Pour reinitiliser votre mot de passe cliquer <a href="{url}">ici</a>""".format(url=url)
+            msg = u"""Pour reinitialiser votre mot de passe cliquer <a href="{url}">ici</a>""".format(url=url)
             if email:
-                print(email)
                 sendmail2("DITweets.di",email,u"Réinitialisation mot de passe",msg=msg)
                 return render_template('reset_request.html', sent=True)
 
@@ -200,12 +200,15 @@ class Auth:
 
     def get_data(self,username):
         userdir = self.get_dir(username)
-        return pickle.load(open(os.path.join(userdir,'data'),'rb'))
+        if userdir:
+            return pickle.load(open(os.path.join(userdir,'data'),'rb'))
+        else:
+            return None
 
     def set_data(self,username,data):
         userdir = self.get_dir(username)
-        pickle.dump(data,open(os.path.join(userdir,'data'),'wb'))
-
+        if userdir:
+            pickle.dump(data,open(os.path.join(userdir,'data'),'wb'))
 
     def init(self,app_path):
         path = os.path.join(app_path,'users')
