@@ -111,6 +111,7 @@ def twitter_job():
                     for tweet in twitter_ids.get(account,{}).get(it,[]):
                         todo[do][tweet] = 1
         print(todo)
+        logs.append(data)
         logs.append(todo)
         qtwitter.put({'userdata':data,'todo':todo})
 
