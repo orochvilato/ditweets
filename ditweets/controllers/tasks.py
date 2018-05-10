@@ -15,7 +15,15 @@ import twitter
 
 def dotask(userdata,todo):
     from ditweets.controllers.twitter import twitterAccount
-    from ditweets import mdb, mdbrw
+    import pymongo
+    from .config_private import mongo_read_user,mongo_read_password,mongo_write_user,mongo_write_password,smtp
+
+    client = pymongo.MongoClient('mongodb://%s:%s@ditweets.orvdev.fr:27017/ditweets' %(mongo_read_user,mongo_read_password))
+    mdb = client.ditweets
+
+    clientrw = pymongo.MongoClient('mongodb://%s:%s@ditweets.orvdev.fr:27017/ditweets' %(mongo_write_user,mongo_write_password))
+    mdbrw = clientrw.ditweets
+
 
     api = twitterAccount(userdata)
     print("go")
