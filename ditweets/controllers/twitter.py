@@ -79,6 +79,7 @@ def twitter_job():
 
     mdbrw.actions.update_many({'tweet_id':{'$lte':maxId}},{'$set':{'done':True}})
     twitter_ids = {}
+    logs = []
     for a in mdb.actions.find({'done':None}):
         if not a['screen_name'] in twitter_ids.keys():
             twitter_ids[a['screen_name']] = {'tweets':[],'replies':[],'likes':[],'retweets':[]}
@@ -91,8 +92,8 @@ def twitter_job():
             twitter_ids[a['screen_name']]['tweets'].append(a['tweet_id'])
         elif a['action']=='retweet':
             twitter_ids[a['screen_name']]['retweets'].append(a['tweet_id'])
-        print(a)
-    print(twitter_ids)
+
+    logs.append(twitter_ids)
     for data in auth.users_data():
         if not data.get('twitter_success',False):
             continue
@@ -110,10 +111,11 @@ def twitter_job():
                     for tweet in twitter_ids.get(account,{}).get(it,[]):
                         todo[do][tweet] = 1
         print(todo)
+        logs.append(todo)
         qtwitter.put({'userdata':data,'todo':todo})
 
-
-    return 'ok'
+    import json
+    return json.dumps(logs)
 
 def get_user_stats():
     pass
