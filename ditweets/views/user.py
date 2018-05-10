@@ -36,7 +36,7 @@ from ditweets.config_private import twitter_fetch
 def newt():
     #api = twitterAccount(twitter_fetch)
     #getTwitterData(api)
-    twitter_job()
+    return twitter_job()
 
 from ditweets.controllers.actions import add_action, del_action, update_action, get_action, get_actions
 
