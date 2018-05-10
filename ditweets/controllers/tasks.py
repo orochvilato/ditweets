@@ -19,6 +19,9 @@ def dotask(userdata,todo):
 
     api = twitterAccount(userdata)
     print("go")
+    import json
+    with open('/tmp/ditweets.log','a') as f:
+        f.write(json.dumps(todo))
     # RECHERCHER LE SCREENNAME DU COMPTE
     maxId = mdb.tweets.find().sort("id",-1).limit(1)
     maxId = maxId[0]['id'] if maxId else 0
