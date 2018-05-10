@@ -26,25 +26,25 @@ def dotask(userdata,todo):
     for id in todo['like'].keys():
         #if id<=maxId:
         #    continue
-        try:
+        if 1:#try:
             sleep(random.random()/2)
             api.CreateFavorite(status_id=id, include_entities=False)
             mdbrw.logs.insert_one({'username':userdata['username'],'action':'like','tweet_id':id})
-        except Exception as err:
-            pass
-            print(err.message)
+        #except Exception as err:
+        #    pass
+        #    print(err.message)
 
     print('rt',len(todo['rt']))
     for id in todo['rt'].keys():
         #if id<=maxId:
         #    continue
-        try:
+        if 1:#try:
             sleep(random.random()/2)
             api.PostRetweet(status_id=id,trim_user=True)
             mdbrw.logs.insert_one({'username':userdata['username'],'action':'rt','tweet_id':id})
-        except Exception as err:
-            pass
-            print(err.message)
+        #except Exception as err:
+        #    pass
+        #    print(err.message)
     print("done")
 
 def worker(n):
