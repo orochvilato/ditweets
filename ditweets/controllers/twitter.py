@@ -89,9 +89,10 @@ def twitter_job():
             twitter_ids[a['screen_name']]['likes'].append(a['tweet_id'])
         elif a['action']=='tweet':
             twitter_ids[a['screen_name']]['tweets'].append(a['tweet_id'])
-        elif a['action']=='reply':
+        elif a['action']=='retweet':
             twitter_ids[a['screen_name']]['retweets'].append(a['tweet_id'])
-
+        print(a)
+    print(twitter_ids)
     for data in auth.users_data():
         if not data.get('twitter_success',False):
             continue
