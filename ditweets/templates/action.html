@@ -79,7 +79,7 @@
   <div class="field-body">
     <div class="field">
       <div class="control">
-        <textarea name="tweet_content" class="textarea tweet_content" placeholder="Contenu du tweet"></textarea>
+        <textarea id="tweet_content_area" name="tweet_content" class="textarea tweet_content" placeholder="Contenu du tweet"></textarea>
         <div id="fine-uploader-manual-trigger"></div>
       </div>
     </div>
@@ -285,24 +285,38 @@
     </div>
 </script>
 <script>
-  function set_value(evt) {
-    var e = evt.currentTarget;
-    var field = document.getElementById(e.name);
-    field.setAttribute('value',e.value);
-  }
-  var x = document.getElementsByTagName('select');
-  var i;
-  for (i = 0; i < x.length; i++) {
-    x[i].onchange = set_value;
-  }
 
-  $(".tweet_content").emojioneArea({
-  pickerPosition: "bottom",
-  filtersPosition: "bottom",
-  tonesStyle: "square"
-});
-</script>
-<script>
+
+  $(document).ready(function(){
+    function set_value(evt) {
+      var e = evt.currentTarget;
+      var field = document.getElementById(e.name);
+      field.setAttribute('value',e.value);
+    }
+    var x = document.getElementsByTagName('select');
+    var i;
+    for (i = 0; i < x.length; i++) {
+      x[i].onchange = set_value;
+    }
+
+
+
+
+    // emoji
+    $(".tweet_content").emojioneArea({
+      pickerPosition: "bottom",
+      filtersPosition: "bottom",
+      tonesStyle: "square",
+      events: {
+        keyup : function (editor,event) {
+
+          console.log(event);
+          
+        }
+      }
+    });
+
+    // fineUploader
     $('#fine-uploader-manual-trigger').fineUploader({
         template: 'qq-template-gallery',
         request: {
@@ -325,5 +339,10 @@
     $('#trigger-upload').click(function() {
         $('#fine-uploader-manual-trigger').fineUploader('uploadStoredFiles');
     });
+
+
+
+
+  });
 </script>
 {% endblock %}
