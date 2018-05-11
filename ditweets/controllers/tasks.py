@@ -23,7 +23,7 @@ def dotask(userdata,todo):
     from datetime import datetime
     with open('/tmp/ditweets.log','a') as f:
 
-        f.write('---- start %s ----\n' % datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        f.write('---- start %s (%s) ----\n' % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'),userdata.get('username','VIDE')))
         f.write("%s\n" % json.dumps(todo))
     # RECHERCHER LE SCREENNAME DU COMPTE
     #maxId = mdb.tweets.find().sort("id",-1).limit(1)
@@ -48,7 +48,7 @@ def dotask(userdata,todo):
             except Exception as err:
                 f.write("RT %d : %s \n" % (id,err.message))
 
-        f.write('---- end ----%s\n' % datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        f.write('---- end %s (%s) ----\n' % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), userdata.get('username','VIDE')))
 
 def worker(n):
 	while True:
