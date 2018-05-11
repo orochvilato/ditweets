@@ -18,37 +18,37 @@ def dotask(userdata,todo):
     from ditweets import mdb, mdbrw
 
     api = twitterAccount(userdata)
-    print("go")
+
     import json
+    from datetime import datetime
     with open('/tmp/ditweets.log','a') as f:
-        f.write(json.dumps(todo))
+
+        f.write('---- start %s ----\n' % datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        f.write("%s\n" % json.dumps(todo))
     # RECHERCHER LE SCREENNAME DU COMPTE
     #maxId = mdb.tweets.find().sort("id",-1).limit(1)
     #maxId = maxId[0]['id'] if maxId else 0
-    print('likes',len(todo['like']))
-    for id in todo['like'].keys():
-        #if id<=maxId:
-        #    continue
-        if 1:#try:
-            #sleep(random.random()/2)
-            api.CreateFavorite(status_id=id, include_entities=False)
-            mdbrw.logs.insert_one({'username':userdata['username'],'action':'like','tweet_id':id})
-        #except Exception as err:
-        #    pass
-        #    print(err.message)
+        for id in todo['like'].keys():
+            #if id<=maxId:
+            #    continue
+            try:
+                sleep(random.random()/2)
+                api.CreateFavorite(status_id=id, include_entities=False)
+                mdbrw.logs.insert_one({'username':userdata['username'],'action':'like','tweet_id':id})
+            except Exception as err:
+                f.write("Like %d : %s \n" % (id,err.message))
 
-    print('rt',len(todo['rt']))
-    for id in todo['rt'].keys():
-        #if id<=maxId:
-        #    continue
-        if 1:#try:
-            #sleep(random.random()/2)
-            api.PostRetweet(status_id=id,trim_user=True)
-            mdbrw.logs.insert_one({'username':userdata['username'],'action':'rt','tweet_id':id})
-        #except Exception as err:
-        #    pass
-        #    print(err.message)
-    print("done")
+        for id in todo['rt'].keys():
+            #if id<=maxId:
+            #    continue
+            try:
+                sleep(random.random()/2)
+                api.PostRetweet(status_id=id,trim_user=True)
+                mdbrw.logs.insert_one({'username':userdata['username'],'action':'rt','tweet_id':id})
+            except Exception as err:
+                f.write("RT %d : %s \n" % (id,err.message))
+
+        f.write('---- end ----%s\n' % datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
 def worker(n):
 	while True:
