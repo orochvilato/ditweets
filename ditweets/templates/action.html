@@ -2,6 +2,7 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" id="editor-theme" href="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.css">
 <link href="/static/css/fineuploader.css" rel="stylesheet">
+<link href="https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.css" rel="stylesheet">
 
 <style>
 .spacer {
@@ -14,6 +15,14 @@
   background-color: #00d1b2;
   color: white;
 }
+.awesomplete {
+  width: 100%;
+}
+.awesomplete > ul > li {
+  font-size:0.8em;
+  padding-top:0.1em;
+  padding-bottom:0.1em;
+}
 #tweet_type[value="Nouveau"] ~ #tweet_id {
   display: none;
   visibility: hidden;
@@ -24,7 +33,6 @@
 }
 
 
-}
 </style>
 
 <!-- https://github.com/mervick/emojionearea -->
@@ -80,13 +88,42 @@
     <div class="field">
       <div class="control">
         <textarea id="tweet_content_area" name="tweet_content" class="textarea tweet_content" placeholder="Contenu du tweet"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- pings -->
+<div id="tweet_pings" class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Pings</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input id="tweet_pings_input" type="text" name="tweet_pings" class="input tweet_pings" placeholder="Utilisateurs tweeter à pinger"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Attachments -->
+<div id="tweet_medias" class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">Medias</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
         <div id="fine-uploader-manual-trigger"></div>
       </div>
     </div>
-    <br>
-
   </div>
 </div>
+
+
+
+<br>
 
 <h3>Programmation</h3>
 
@@ -203,7 +240,7 @@
 </section>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/jquery.fine-uploader/jquery.fine-uploader.min.js"></script>
-
+<script src='https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.js'></script>
 <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
 <script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script>
 <!-- Fine Uploader Thumbnails template w/ customization
@@ -311,7 +348,7 @@
         keyup : function (editor,event) {
 
           console.log(event);
-          
+
         }
       }
     });
@@ -340,8 +377,41 @@
         $('#fine-uploader-manual-trigger').fineUploader('uploadStoredFiles');
     });
 
+    // autocomplete tags
+    var input = document.getElementById("tweet_pings_input");
+    var awesomplete = new Awesomplete(input, {
+      minChars: 1,
+      autoFirst: true,
+      filter: function(text, input) {
+		      return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+	    },
+	    item: function(text, input) {
+		      return Awesomplete.ITEM(text, input.match(/[^,]*$/)[0]);
+	    },
+	    replace: function(text) {
+		      var before = this.input.value.match(/^.+,\s*|/)[0];
+		      this.input.value = before + text.value + ", ";
+	    }
+    });
 
-
+    $("#tweet_pings_input").on("keyup", function(){
+      var tags = this.value.split(', ');
+      var tag = tags[tags.length-1];
+      console.log(tag);
+      $.ajax({
+        url: 'https://twitter.com/i/search/typeahead.json?count=10&filters=false&q='+tag+'&result_type=users&src=SEARCH_BOX',
+        type: 'GET',
+        dataType: 'jsonp',
+        crossDomain: true
+      })
+      .success(function(data) {
+        var list = [];
+        $.each(data.users, function(key, value) {
+          list.push({'label':value.name + ' ('+value.screen_name+')','value':'@'+value.screen_name});
+        });
+        awesomplete.list = list;
+      });
+    });
 
   });
 </script>
