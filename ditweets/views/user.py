@@ -60,43 +60,62 @@ def view_del_action(action_id):
 def edit_tweet(tweet_id=None):
     return render_template('tweet_edit.html')
 
-@app.route('/action_tweet',methods=['POST','GET'])
-@app.route('/action_tweet/<action_id>',methods=['POST','GET'])
+@app.route('/action',methods=['POST','GET'])
+@app.route('/action/<action_id>',methods=['POST','GET'])
 @require_login('/action_tweet')
 def action_tweet(action_id=None):
     if request.method=='GET':
         action = get_action(action_id) if action_id else {}
         return render_template('action.html',action_id=action_id,**action)
     elif request.method=='POST':
-        actions = []
-        if request.form.get('like'):
-            actions.append('like')
-        if request.form.get('rt'):
-            actions.append('rt')
-        tweet_id = request.form.get('tweet_id')
-        action = {'duration': int(request.form.get('duration')),
-                'actions': actions,
-              'tweet_id': tweet_id,
-              'number': int(request.form.get('number')),
-              'start': request.form.get('start')
-              }
+        action = {}
+        if request.form.get('tweet_type')=='tweet':
+            action.update({
+                'tweet_content':request.form.get('tweet_content'),
+                'tweet_medias':request.form.get('tweet_medias'),
+            })
+        else:
+            action.update({
+                'tweet_id':request.form.get('tweet_id'),
+            })
+        action.update({
+            'tweet_tags': request.form.get('tweet_tags'),
+            'start': request.form.get('start')
+            })
+        if request.form.get('diffusion_active')=='on':
+            diff_actions = []
+            if request.form.get('like'):
+                diff_actions.append('like')
+            if request.form.get('rt'):
+                diff_actions.append('rt')
+
+            action.update({
+                'duration': request.form.get('duration'),
+                'actions': diff_actions,
+                'comptes': request.form.get('comptes'),
+                'diffusion': request.form.get('diffusion')
+            })
+
+
         data = auth.get_data(session['id']['username'])
-        api = twitterAccount(data)
         action_id = request.form.get('action_id')
-        try:
-            tweet = api.GetStatus(status_id = tweet_id)
-            action['tweet_text'] = tweet.text
-            action['user'] = tweet.user.name
-            #<a href="https://twitter.com/statuses/{{ action['tweet_id'] }}">{{ action['tweet_text'] }}</a>
-            action['screenname'] = tweet.user.screen_name
-            action['user_image'] = tweet.user.profile_image_url
-            if action_id:
-                update_action(action_id,action)
-            else:
-                id = add_action(action)
-            return redirect('/actions')
-        except:
-            return render_template('action_tweet.html', action_id=action_id, **action, tweet_error=True)
+        if 'tweet_id' in action.keys():
+            api = twitterAccount(twitter_fetch)
+            try:
+                tweet = api.GetStatus(status_id = tweet_id)
+                action['tweet_text'] = tweet.text
+                action['user'] = tweet.user.name
+                #<a href="https://twitter.com/statuses/{{ action['tweet_id'] }}">{{ action['tweet_text'] }}</a>
+                action['screenname'] = tweet.user.screen_name
+                action['user_image'] = tweet.user.profile_image_url
+            except:
+                return render_template('action.html', action_id=action_id, **action, tweet_error=True)
+
+        if action_id:
+            update_action(action_id,action)
+        else:
+            id = add_action(action)
+        return request.form.get('start')
 
 @app.route('/actions')
 def view_actions():

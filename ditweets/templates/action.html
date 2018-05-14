@@ -23,11 +23,11 @@
   padding-top:0.1em;
   padding-bottom:0.1em;
 }
-#tweet_type[value="Nouveau"] ~ #tweet_id {
+#tweet_type[value="tweet"] ~ #tweet_id {
   display: none;
   visibility: hidden;
 }
-#tweet_type[value="Existant"] ~ #tweet_content {
+#tweet_type[value="rt"] ~ #tweet_content, #tweet_type[value="rt"] ~ #tweet_medias {
   display: none;
   visibility: hidden;
 }
@@ -39,26 +39,27 @@
 <!-- https://fineuploader.com/demos.html -->
 
 <section class="container content">
-<form id="action" action="action" method="post">
+<form id="action" action="action" method="post" novalidate>
 <div class="spacer1"></div>
-<h1>{% if action_id %}Modifier{% else %}Nouvelle{% endif %} opération</h1>
+<h1>{% if action_id %}Modifier{% else %}Nouvelle{% endif %} opération <input type="submit" class="button is-primary" value="Valider"></h1>
 {% if action_id %}<input type="hidden" name="action_id" value="{{ action_id }}">{% endif %}
 <hr>
 <h3>Objet</h3>
 
-
+<input name="tweet_medias" id="upload_ids" type="hidden">
+<input name="timezone" id="timezone" type="hidden">
 
 <!-- Tweet Type -->
 
-<div id="tweet_type" class="field is-horizontal" value="Nouveau">
+<div id="tweet_type" class="field is-horizontal" value="{% if tweet_id %}rt{% else %}tweet{% endif %}">
   <div class="field-label is-normal">
-    <label class="label">Tweet</label>
+    <label class="label">Type Action</label>
   </div>
   <div class="field-body">
     <div class="select">
       <select name="tweet_type">
-        <option>Nouveau</option>
-        <option>Existant</option>
+        <option value="tweet">Tweet</option>
+        <option value="rt" {% if tweet_id %}selected{% endif %}>RT</option>
       </select>
     </div>
   </div>
@@ -101,7 +102,7 @@
   <div class="field-body">
     <div class="field">
       <div class="control">
-        <input id="tweet_pings_input" type="text" name="tweet_pings" class="input tweet_pings" placeholder="Utilisateurs twitter à tagger"></textarea>
+        <input id="tweet_pings_input" type="text" name="tweet_tags" class="input tweet_pings" placeholder="Utilisateurs twitter à tagger"></textarea>
       </div>
     </div>
   </div>
@@ -144,13 +145,13 @@
 
 <hr>
 <style>
- #diffusion[value="off"] ~ #diffusion_bloc {
+ #diffusion_active[value="off"] ~ #diffusion_bloc {
    display:none;
    visibility: hidden;
  }
 </style>
 
-<h3 id="diffusion" value="off">Diffusion <input name="diffusion" type="checkbox" onchange="document.getElementById('diffusion').setAttribute('value', (this.checked?'on':'off'));"></h3>
+<h3 id="diffusion_active" value="off">Diffusion <input name="diffusion_active" type="checkbox" onchange="document.getElementById('diffusion_active').setAttribute('value', (this.checked?'on':'off'));"></h3>
 
 <!-- RT/Like -->
 <div id="diffusion_bloc">
@@ -194,10 +195,10 @@
   </div>
   <div class="field-body">
     <div class="select">
-      <select name="diffusion">
-        <option>Aléatoire</option>
-        <option>Nombre d'abonnés décroissant</option>
-        <option>Nombre d'abonnés croissant</option>
+      <select name="comptes">
+        <option value="hasard">Aléatoire</option>
+        <option value="decroissant">Nombre d'abonnés décroissant</option>
+        <option value="croissant">Nombre d'abonnés croissant</option>
       </select>
     </div>
   </div>
@@ -211,9 +212,9 @@
   <div class="field-body">
     <div class="select">
       <select name="diffusion">
-        <option>Linéaire</option>
-        <option>Logarithmique</option>
-        <option>Exponentielle</option>
+        <option value="lineaire">Linéaire</option>
+        <option value="logarithmique">Logarithmique</option>
+        <option value="exponentielle">Exponentielle</option>
       </select>
     </div>
   </div>
@@ -243,6 +244,7 @@
 <script src='https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.js'></script>
 <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
 <script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script>
+<script src="/static/js/jstz.min.js"></script>
 <!-- Fine Uploader Thumbnails template w/ customization
 ====================================================================== -->
 <script type="text/template" id="qq-template-gallery">
@@ -371,11 +373,15 @@
           endpoint: '/upload'
     },
         autoUpload: true
+    }).on('complete', function (event, fileId, fileName,json) {
+      updateFileList();
+    }).on('deleteComplete', function (event, fileId, fileName,json) {
+      updateFileList();
     });
 
-    $('#trigger-upload').click(function() {
-        $('#fine-uploader-manual-trigger').fineUploader('uploadStoredFiles');
-    });
+    function updateFileList() {
+      $("#upload_ids").val($('#fine-uploader-manual-trigger').fineUploader('getUploads',{status: qq.status.UPLOAD_SUCCESSFUL}).map(function(e) { return e.uuid;}).join(','));
+    }
 
     // autocomplete tags
     var input = document.getElementById("tweet_pings_input");
@@ -412,6 +418,11 @@
         awesomplete.list = list;
       });
     });
+
+    // Timezone
+
+    $('#timezone').val(jstz.determine().name());
+
 
   });
 </script>
