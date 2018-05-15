@@ -161,7 +161,7 @@ def root():
 def param():
     username = session['id']['username']
     data = auth.get_data(username)
-    return render_template('param.html',session=session,comptes=cache['comptes'],params=data.get('params',{}))
+    return render_template('param_adv.html',session=session,comptes=cache['comptes'],params=data.get('params',{}))
 
 @app.route('/config')
 @require_login(redir='config')
