@@ -19,15 +19,24 @@
   font-weight: 600;
   color: #209cee;
 }
+.pct {
+  position:absolute;
+  right:5px;
+}
+
 .cnumber[value="0"] {
   background-color:#fff;
   color: #363636;
+}
+.cnumber[value="100"] {
+  opacity:1;
+  color: white;
 }
 
 .cnumber {
   color: white;
   background-color:#00d1b2;
-
+  opacity:0.70;
   cursor: pointer;
   width: 5.2em;
   padding-bottom: calc(.375em - 1px);
@@ -53,8 +62,8 @@ input[type="number"]:focus {
 }
 input[type="number"] {
   font-weight:600;
-  font-size: 1.2rem;
-  width:2.5em;
+  font-size: 0.8rem;
+  width:2.4rem;
   background-color: transparent;
   color: white;
   border: none;
@@ -65,6 +74,9 @@ input[type="number"][value="0"] {
     color: #363636;
     color: #fff;
 
+}
+.control {
+  font-size:0.8rem;
 }
 </style>
 <section class="container content">
@@ -88,8 +100,8 @@ input[type="number"][value="0"] {
     </tr>
 
     <tr><th></th>
-      <th><span onclick="select_all(['tweets_rt_{{loop.index}}','retweets_rt_{{loop.index}}','likes_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
-          <span onclick="select_all(['tweets_like_{{loop.index}}','retweets_like_{{loop.index}}','likes_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
+      <th><span onclick="select_all(['tweets_rt_{{loop.index}}','retweets_rt_{{loop.index}}','likes_rt_{{loop.index}}','replies_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
+          <span onclick="select_all(['tweets_like_{{loop.index}}','retweets_like_{{loop.index}}','likes_like_{{loop.index}}','replies_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
       <th><span onclick="select_all(['tweets_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
               <span onclick="select_all(['tweets_like_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-heart"></i></span></th>
       <th><span onclick="select_all(['retweets_rt_{{loop.index}}'])" class="button is-small is-light"><i class="fas fa-retweet"></i></span>
@@ -111,52 +123,67 @@ input[type="number"][value="0"] {
     <span onclick="select_all(['{{ account }}_like'])" class="button is-small is-light"><i class="fas fa-heart"></i></span>
   </td>
   <td>
-    <span class="control cnumber" id="{{ account }}_tweets_rt" value="{{ params.get('%s_tweets_rt' % account, 0)}}">
+    <span class="control cnumber {{ account }}_rt tweets_rt_{{icat}}" id="{{ account }}_tweets_rt" value="{{ params.get('%s_tweets_rt' % account, 0)}}">
       <span class="icon">
         <i class="fas fa-retweet"></i>
       </span>
-      <input class="{{ account }}_rt tweets_rt_{{icat}}" name="{{ account }}_tweets_rt" type="number" min=0 max=100 step=5 value="{{ params.get('%s_tweets_rt' % account, 0)}}">
+      <input name="{{ account }}_tweets_rt" type="number" min=0 max=100 step=5 value="{{ params.get('%s_tweets_rt' % account, 0)}}">
+
     </span>
-    <span class="control cnumber" id="{{ account }}_tweets_like" value="{{ params.get('%s_tweets_like' % account, 0)}}">
+    <span class="control cnumber {{ account }}_rt tweets_like_{{icat}}" id="{{ account }}_tweets_like" value="{{ params.get('%s_tweets_like' % account, 0)}}">
       <span class="icon is-left">
         <i class="fas fa-heart"></i>
       </span>
-      <input class="{{ account }}_rt tweets_like_{{icat}}" name="{{ account }}_tweets_like" type="number" min=0 max=100 step=5 value="{{ params.get('%s_tweets_like' % account, 0)}}">
+      <input name="{{ account }}_tweets_like" type="number" min=0 max=100 step=5 value="{{ params.get('%s_tweets_like' % account, 0)}}">
+    </span>
+  </td>
+  <td>
+    <span class="control cnumber {{ account }}_rt retweets_rt_{{icat}}" id="{{ account }}_retweets_rt" value="{{ params.get('%s_retweets_rt' % account, 0)}}">
+      <span class="icon">
+        <i class="fas fa-retweet"></i>
+      </span>
+      <input name="{{ account }}_retweets_rt" type="number" min=0 max=100 step=5 value="{{ params.get('%s_retweets_rt' % account, 0)}}">
+
+    </span>
+    <span class="control cnumber {{ account }}_rt retweets_like_{{icat}}" id="{{ account }}_retweets_like" value="{{ params.get('%s_retweets_like' % account, 0)}}">
+      <span class="icon is-left">
+        <i class="fas fa-heart"></i>
+      </span>
+      <input name="{{ account }}_retweets_like" type="number" min=0 max=100 step=5 value="{{ params.get('%s_retweets_like' % account, 0)}}">
     </span>
   </td>
 
-<td><span class="cbutton">
- <label>
-    <input class="{{ account }}_rt retweets_rt_{{icat}}" name="{{ account }}_retweets_rt" type="checkbox" {% if params.get('%s_retweets_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
- </label>
-</span>
-<span class="cbutton">
-<label>
-  <input class="{{ account }}_like retweets_like_{{icat}}" name="{{ account }}_retweets_like" type="checkbox" {% if params.get('%s_retweets_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
-</label>
-</span></td>
+  <td>
+    <span class="control cnumber {{ account }}_rt likes_rt_{{icat}}" id="{{ account }}_likes_rt" value="{{ params.get('%s_likes_rt' % account, 0)}}">
+      <span class="icon">
+        <i class="fas fa-retweet"></i>
+      </span>
+      <input name="{{ account }}_likes_rt" type="number" min=0 max=100 step=5 value="{{ params.get('%s_likes_rt' % account, 0)}}">
 
-<td><span class="cbutton">
- <label>
-    <input class="{{ account }}_rt likes_rt_{{icat}}" name="{{ account }}_likes_rt" type="checkbox" {% if params.get('%s_likes_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
- </label>
-</span>
-<span class="cbutton">
-<label>
-  <input class="{{ account }}_like likes_like_{{icat}}" name="{{ account }}_likes_like" type="checkbox" {% if params.get('%s_likes_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
-</label>
-</span></td>
+    </span>
+    <span class="control cnumber {{ account }}_rt likes_like_{{icat}}" id="{{ account }}_likes_like" value="{{ params.get('%s_likes_like' % account, 0)}}">
+      <span class="icon is-left">
+        <i class="fas fa-heart"></i>
+      </span>
+      <input name="{{ account }}_likes_like" type="number" min=0 max=100 step=5 value="{{ params.get('%s_likes_like' % account, 0)}}">
+    </span>
+  </td>
 
-<td><span class="cbutton">
- <label>
-    <input class="{{ account }}_rt replies_rt_{{icat}}" name="{{ account }}_replies_rt" type="checkbox" {% if params.get('%s_replies_rt' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-retweet"></i></span>
- </label>
-</span>
-<span class="cbutton">
-<label>
-  <input class="{{ account }}_like replies_like_{{icat}}" name="{{ account }}_replies_like" type="checkbox" {% if params.get('%s_replies_like' % account, None) %}checked{% endif %} hidden><span class="button"><i class="fas fa-heart"></i></span>
-</label>
-</span></td>
+  <td>
+    <span class="control cnumber {{ account }}_rt replies_rt_{{icat}}" id="{{ account }}_replies_rt" value="{{ params.get('%s_replies_rt' % account, 0)}}">
+      <span class="icon">
+        <i class="fas fa-retweet"></i>
+      </span>
+      <input name="{{ account }}_replies_rt" type="number" min=0 max=100 step=5 value="{{ params.get('%s_replies_rt' % account, 0)}}">
+
+    </span>
+    <span class="control cnumber {{ account }}_rt replies_like_{{icat}}" id="{{ account }}_replies_like" value="{{ params.get('%s_replies_like' % account, 0)}}">
+      <span class="icon is-left">
+        <i class="fas fa-heart"></i>
+      </span>
+      <input name="{{ account }}_replies_like" type="number" min=0 max=100 step=5 value="{{ params.get('%s_replies_like' % account, 0)}}">
+    </span>
+  </td>
 
 </tr>
 {% endfor %}
@@ -178,20 +205,21 @@ input[type="number"][value="0"] {
       var i;
       states[elt] = (states[elt]==true?false:true);
       for (i = 0; i < x.length; i++) {
-        x[i].checked = states[elt];
+        setItem($(x[i]),(states[elt]==true?'100':'0'));
       }
     }
   }
   </script>
   <script>
+    function setItem(item,value) {
+      $('input[name="'+item.attr('id')+'"]').val(value).attr('value',value);
+      $(item).attr('value',value);
+    }
     $(document).ready(function(){
       $('.cnumber .icon').click(function(evt) {
         var item = $(this).parent();
         var value=(item.attr('value')!=='0'?'0':'100');
-
-        $('input[name="'+item.attr('id')+'"]').val(value).attr('value',value);
-        $(this).parent().attr('value',value);
-
+        setItem(item,value);
       });
       $('input[type="number"]').change(function(evt) {
         $(this).attr('value',$(this).val());

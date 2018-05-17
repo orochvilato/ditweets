@@ -161,7 +161,10 @@ def root():
 def param():
     username = session['id']['username']
     data = auth.get_data(username)
-    return render_template('param_adv.html',session=session,comptes=cache['comptes'],params=data.get('params',{}))
+    print(data['params'])
+    params = dict((k,'100' if v=='on' else v) for k,v in data.get('params',{}).items())
+    print(params)
+    return render_template('param_adv.html',session=session,comptes=cache['comptes'],params=params)
 
 @app.route('/config')
 @require_login(redir='config')
@@ -199,5 +202,6 @@ def config_twitter():
 def params():
     username = session['id']['username']
     data = auth.get_data(username)
-    auth.update_data(username,{'params':request.form.to_dict()})
+    params = dict((k,v) for k,v in request.form.to_dict().items() if v!='0')
+    auth.update_data(username,{'params':params})
     return redirect('/param')

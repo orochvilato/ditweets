@@ -93,7 +93,7 @@ def twitter_job():
         elif a['action']=='retweet':
             twitter_ids[a['screen_name']]['retweets'].append(a['tweet_id'])
 
-    logs.append(twitter_ids)
+    from random import random
     for data in auth.users_data():
         if not data.get('twitter_success',False):
             continue
@@ -105,14 +105,13 @@ def twitter_job():
             for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like'),('replies','rt'),('replies','like')]:
                 item = "{account}_{item}_{action}".format(account=account, item=_item, action=_action)
                 if item in data.get('params',{}).keys():
-                    actions[_action] = actions.get(_action,[]) + [ _item ]
+                    if (float(params[item])/100+random())>=1:
+                        actions[_action] = actions.get(_action,[]) + [ _item ]
             for do in ['rt','like']:
                 for it in actions[do]:
                     for tweet in twitter_ids.get(account,{}).get(it,[]):
                         todo[do][tweet] = 1
-        print(todo)
-        logs.append(data)
-        logs.append(todo)
+
         qtwitter.put({'userdata':data,'todo':todo})
 
     import json
