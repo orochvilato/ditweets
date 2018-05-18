@@ -223,7 +223,6 @@ input[type="number"][value="0"] {
   </script>
   <script>
     function setItem(item,value,clean) {
-      $('input[name="'+item.attr('id')+'"]').val(value).attr('value',value);
       var v = $(item).attr('id');
       if (clean) {
         var val = 0;
@@ -232,9 +231,15 @@ input[type="number"][value="0"] {
         var val = value;
         var defaut = defaults[v]==value;
       }
+      $('input[name="'+item.attr('id')+'"]').val(val).attr('value',val);
       $(item).attr('value',val).attr('defaut',defaut);
     }
     $(document).ready(function(){
+      $('.cnumber').each(function() {
+        var v = $(this).attr('id');
+        var value = $(this).attr('value');
+        $(this).attr('defaut',(value==defaults[v] && value!=0));
+      });
       $('.cnumber .icon').click(function(evt) {
         var item = $(this).parent();
         var v = $(item).attr('id');
