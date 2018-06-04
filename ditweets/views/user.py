@@ -6,10 +6,9 @@ from flask import render_template, request, session, redirect
 import json
 
 
-
-
 from ditweets.controllers.twitter import twitter_job, twitterAccount
 from ditweets.controllers.imports import gsheet_twitter
+
 @app.route('/forcereload')
 @is_admin
 def forcereload():
@@ -21,7 +20,6 @@ def forcereload():
 def stats():
     username = session['id']['username']
     data = auth.get_file(username,'stats')
-    print(data)
     return "ok"
 
 @app.route('/forcetask')
@@ -120,7 +118,7 @@ def action_tweet(action_id=None):
 @app.route('/actions')
 def view_actions():
     actions = sorted([ action for action in get_actions().values()], key=lambda x:x['start'], reverse = True)
-    print(actions)
+
     return render_template('actions.html', actions=actions)
 
 @app.route('/test')
@@ -131,7 +129,6 @@ def test():
     tapi = twitterAccount(data)
     tweets = tapi.GetUserTimeline(screen_name="Action_Insoumis",count=30)
     for t in tweets:
-
             print(t)
         #if t.id == 990346844218757120:
         #    print(t)
@@ -161,7 +158,11 @@ def root():
 def param():
     username = session['id']['username']
     data = auth.get_data(username)
-    return render_template('param_adv.html',session=session,comptes=cache['comptes'],params=data.get('params',{}))
+
+    defaults = cache['defaults']
+    params = dict((k,'100' if v=='on' else v) for k,v in data.get('params',{}).items())
+
+    return render_template('param_adv.html',session=session,defaults=defaults,comptes=cache['comptes'],params=params)
 
 @app.route('/config')
 @require_login(redir='config')
@@ -199,5 +200,6 @@ def config_twitter():
 def params():
     username = session['id']['username']
     data = auth.get_data(username)
-    auth.update_data(username,{'params':request.form.to_dict()})
+    params = dict((k,v) for k,v in request.form.to_dict().items() if v!='0')
+    auth.update_data(username,{'params':params})
     return redirect('/param')
