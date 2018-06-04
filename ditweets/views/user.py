@@ -168,9 +168,9 @@ def param():
 def config():
     username = session['id']['username']
     data = auth.get_data(username)
-    # check twitter
-    tapi = twitterAccount(data)
     try:
+        # check twitter
+        tapi = twitterAccount(data)
         lasttweet = tapi.GetUserTimeline(count=1)
         data['twitter_success'] = True
     except:
