@@ -105,7 +105,7 @@ def twitter_job():
             for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like'),('replies','rt'),('replies','like')]:
                 item = "{account}_{item}_{action}".format(account=account, item=_item, action=_action)
                 if item in data.get('params',{}).keys():
-                    val = "100" if data['params'][item]=='on' else data['params'][item]
+                    val = "100" if data['params'][item]=='on' else 0 if data['params'][item]==None else data['params'][item]
                     if (float(val)/100+random())>=1:
                         actions[_action] = actions.get(_action,[]) + [ _item ]
             for do in ['rt','like']:
