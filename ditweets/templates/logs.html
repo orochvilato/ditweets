@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.spacer {
+  margin-top:200px;
+}
+</style>
+<section class="container">
+  <div class="content">
+    <table>
+      <tbody>
+        {% for item in logs %}
+        <tr><td>{{ item['action'] }}</td><td><a href="https://twitter.com/statuses/{{ item['tweet_id']}}" target="_blank">Voir</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %}
