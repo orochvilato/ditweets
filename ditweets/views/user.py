@@ -139,8 +139,8 @@ def test():
 def logs():
     username = session['id']['username']
     items = mdb.logs.find({'username':username},{'action':1,'tweet_id':1,'_id':None}).sort('tweet_id',-1)
-    import json
-    return json.dumps(list(items), sort_keys=True, indent=4)
+    #import json
+    #return json.dumps(list(items), sort_keys=True, indent=4)
     return render_template('logs.html',logs=items)
 
 @app.route('/')
