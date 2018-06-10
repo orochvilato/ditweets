@@ -35,10 +35,11 @@ def dotask(userdata,todo):
             try:
                 sleep(random.random()/2)
                 api.CreateFavorite(status_id=id, include_entities=False)
+                mdbrw.logs.insert_one(log)
             except Exception as err:
                 log['error'] = err.message
                 f.write("Like %d : %s \n" % (id,err.message))
-            mdbrw.logs.insert_one(log)
+
 
 
         for id in todo['rt'].keys():
@@ -48,11 +49,11 @@ def dotask(userdata,todo):
             try:
                 sleep(random.random()/2)
                 api.PostRetweet(status_id=id,trim_user=True)
-
+                mdbrw.logs.insert_one(log)
             except Exception as err:
                 log['error'] = err.message
                 f.write("RT %d : %s \n" % (id,err.message))
-            mdbrw.logs.insert_one(log)
+
         f.write('---- end %s (%s) ----\n' % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), userdata.get('username','VIDE')))
 
 def worker(n):
