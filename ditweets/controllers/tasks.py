@@ -42,7 +42,7 @@ def dotask(userdata,todo):
 
 
         for id in todo['rt'].keys():
-            log = {'username':userdata['username'],'action':'like','tweet_id':id}
+            log = {'username':userdata['username'],'action':'rt','tweet_id':id}
             #if id<=maxId:
             #    continue
             try:
