@@ -37,7 +37,6 @@ def getTwitterData(api):
     params = {}
 
     for account in get_accounts_list(cache['comptes']):
-        print(account)
         maxId = list(mdb.tweets.find({'user.screen_name': account}).sort("id",-1).limit(1))
 
         if maxId:

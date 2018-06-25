@@ -216,5 +216,32 @@ def tops():
     html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>RT + Like</td></tr></thead><tbody>"
     for t in mdb.logs.aggregate(pipeline):
         html += "<tr><td>{user}</td><td>{n}</td></tr>".format(user=t['_id']['user'],n=t['n'])
+
+    html += "</tbody></table>"
+    html += "<hr/><table border='1'><thead><tr><td>Utilisateur</td><td>RT + Like</td></tr></thead><tbody>"
+    if 0:
+        tweets = {}
+        for act in mdb.actions.find({},{'tweet_id':1,'screen_name':1,'_id':None}):
+            tweets[act['tweet_id']] = act['screen_name']
+        accounts = {}
+        for log in mdb.logs.find({},{'tweet_id':1,'username':1,'_id':None}):
+            account = tweets[log['tweet_id']]
+            accounts[account] = accounts.get(account,0) + 1
+
+        print(accounts)
+
     html += "</tbody></table></body></html>"
     return html
+
+@app.route('/tests')
+def tests():
+    from ditweets.controllers.twitter import twitterAccount, getTwitterData, twitter_job
+    from ditweets.config_private import twitter_fetch
+    from ditweets.tools import get_accounts_list
+
+    for data in auth.users_data():
+        api = twitterAccount(data)
+        screen_name = api.GetUserTimeline(count=1)[0].user.screen_name
+        followers = api.GetUser(screen_name=screen_name).followers_count
+        auth.update_data(data['username'],{'followers':followers})
+    return "ok"
