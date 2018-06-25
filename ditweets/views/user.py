@@ -219,7 +219,7 @@ def tops():
                 {'$sort':{'n':-1}}]
     html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>Followers</td><td>RT + Like</td></tr></thead><tbody>"
     for t in mdb.logs.aggregate(pipeline):
-        html += "<tr><td>{user}</td><td>{f}</td><td>{n}</td></tr>".format(f=followers.get([t['_id']['user'],0),user=t['_id']['user'],n=t['n'])
+        html += "<tr><td>{user}</td><td>{f}</td><td>{n}</td></tr>".format(f=followers.get(t['_id']['user'],0),user=t['_id']['user'],n=t['n'])
 
     if 0:
         html += "</tbody></table>"
