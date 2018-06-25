@@ -241,7 +241,10 @@ def tests():
 
     for data in auth.users_data():
         api = twitterAccount(data)
-        screen_name = api.GetUserTimeline(count=1)[0].user.screen_name
-        followers = api.GetUser(screen_name=screen_name).followers_count
-        auth.update_data(data['username'],{'followers':followers})
+        try:
+            screen_name = api.GetUserTimeline(count=1)[0].user.screen_name
+            followers = api.GetUser(screen_name=screen_name).followers_count
+            auth.update_data(data['username'],{'followers':followers})
+        except:
+            pass
     return "ok"
