@@ -210,6 +210,7 @@ def tops():
     followers = {}
     for data in auth.users_data():
         followers[data['username']] = data.get('followers',0)
+
     pgroup = {}
     pgroup['n'] = {'$sum':1}
     pgroup['_id'] = { 'user':'$username'}
@@ -218,11 +219,12 @@ def tops():
                 {'$sort':{'n':-1}}]
     html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>Followers</td><td>RT + Like</td></tr></thead><tbody>"
     for t in mdb.logs.aggregate(pipeline):
-        html += "<tr><td>{user}</td><td>{f}</td><td>{n}</td></tr>".format(f=followers[t['_id']],user=t['_id']['user'],n=t['n'])
+        html += "<tr><td>{user}</td><td>{f}</td><td>{n}</td></tr>".format(f=followers.get([t['_id']['user'],0),user=t['_id']['user'],n=t['n'])
 
-    html += "</tbody></table>"
-    html += "<hr/><table border='1'><thead><tr><td>Utilisateur</td><td>RT + Like</td></tr></thead><tbody>"
     if 0:
+        html += "</tbody></table>"
+        html += "<hr/><table border='1'><thead><tr><td>Utilisateur</td><td>RT + Like</td></tr></thead><tbody>"
+
         tweets = {}
         for act in mdb.actions.find({},{'tweet_id':1,'screen_name':1,'_id':None}):
             tweets[act['tweet_id']] = act['screen_name']
