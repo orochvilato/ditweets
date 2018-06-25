@@ -203,3 +203,18 @@ def params():
     params = dict((k,v) for k,v in request.form.to_dict().items() if v!='0')
     auth.update_data(username,{'params':params})
     return redirect('/param')
+
+@app.route('/tops')
+@require_login(redir='tops')
+def tops():
+    pgroup = {}
+    pgroup['n'] = {'$sum':1}
+    pgroup['_id'] = { 'user':'$username'}
+    pipeline = [{'$match':{'error':None}},
+                {'$group':pgroup},
+                {'$sort':{'n':-1}}]
+    html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>RT + Like</td></tr></thead><tbody>"
+    for t in mdb.logs.aggregate(pipeline):
+        html += "<tr><td>{user}</td><td>{n}</td></tr>".format(user=t['_id']['user'],n=t['n'])
+    html += "</tbody></table></body></html>"
+    return html
