@@ -240,8 +240,8 @@ def tests():
     from ditweets.tools import get_accounts_list
 
     for data in auth.users_data():
-        api = twitterAccount(data)
         try:
+            api = twitterAccount(data)
             screen_name = api.GetUserTimeline(count=1)[0].user.screen_name
             followers = api.GetUser(screen_name=screen_name).followers_count
             auth.update_data(data['username'],{'followers':followers})
