@@ -207,6 +207,7 @@ def params():
 @app.route('/tops')
 @require_login(redir='tops')
 def tops():
+    reverse = request.args.get('r',False)
     followers = {}
     for data in auth.users_data():
         followers[data['username']] = data.get('followers',0)
@@ -220,7 +221,7 @@ def tops():
     accounts = []
     for t in mdb.logs.aggregate(pipeline):
         accounts.append(dict(f=followers.get(t['_id']['user'],0),user=t['_id']['user'],n=t['n']))
-    accounts.sort(key=lambda x:x['f']*x['n'],reverse=True)
+    accounts.sort(key=lambda x:x['f']*x['n'],reverse=True if not reverse else False)
 
     html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>Followers</td><td>RT + Like</td><td>Impact</td></tr></thead><tbody>"
     for a in accounts:
