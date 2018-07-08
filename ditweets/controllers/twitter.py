@@ -96,7 +96,7 @@ def getTwitterData(api):
                 action = "retweet"
             else:
                 action = "tweet"
-            print(lasttweets.get(accout,'Nope'))
+            print(lasttweets.get(account,'Nope'))
             if action == 'tweet' and (tw['created_at']-lasttweets.get(account,datetime(2018,1,1,tzinfo=timezone.utc))).seconds>between_tweets_delay:
                 items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
             else:
