@@ -64,8 +64,8 @@ def getMaxId():
 
 def getTwitterData(api):
     params = {}
-    import datetime, timezone
-    
+
+    from datetime import datetime, timezone
     lasttweets = maxs()
     for account in get_accounts_list(cache['comptes']):
         maxId = list(mdb.tweets.find({'user.screen_name': account}).sort("id",-1).limit(1))
@@ -97,7 +97,7 @@ def getTwitterData(api):
             else:
                 action = "tweet"
             print(lasttweets.get(accout,'Nope'))
-            if action == 'tweet' and (tw['created_at']-lasttweets.get(account,datetime.datetime(2018,1,1,tzinfo=timezone.utc))).seconds>between_tweets_delay:
+            if action == 'tweet' and (tw['created_at']-lasttweets.get(account,datetime(2018,1,1,tzinfo=timezone.utc))).seconds>between_tweets_delay:
                 items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
             else:
                 print('skipped',tw['id'])
