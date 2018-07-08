@@ -20,6 +20,7 @@ def twitterAccount(data):
 def cvTwitterDate(date):
     import locale
     import datetime
+
     locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
     import pytz
     return datetime.datetime.strptime(date,'%a %b %d %H:%M:%S +0000 %Y').replace(tzinfo=pytz.UTC)
@@ -64,6 +65,7 @@ def getMaxId():
 def getTwitterData(api):
     params = {}
     import datetime
+    import timezone
     lasttweets = maxs()
     for account in get_accounts_list(cache['comptes']):
         maxId = list(mdb.tweets.find({'user.screen_name': account}).sort("id",-1).limit(1))
@@ -94,7 +96,8 @@ def getTwitterData(api):
                 action = "retweet"
             else:
                 action = "tweet"
-            if action == 'tweet' and (lasttweets.get(account,datetime.datetime(2018,1,1))-tw['created_at']).seconds>between_tweets_delay:
+            print(lasttweets.get(accout,'Nope'))
+            if action == 'tweet' and (tw['created_at']-lasttweets.get(account,datetime.datetime(2018,1,1,tzinfo=timezone.utc))).seconds>between_tweets_delay:
                 items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
             else:
                 print('skipped',tw['id'])
