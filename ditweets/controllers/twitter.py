@@ -26,6 +26,7 @@ def cvTwitterDate(date):
     return datetime.datetime.strptime(date,'%a %b %d %H:%M:%S +0000 %Y').replace(tzinfo=pytz.UTC)
 
 def maxs():
+    from datetime import timezone
     aggr = [
         {'$match': {'action':'tweet'}},
         {'$group':
@@ -39,7 +40,7 @@ def maxs():
     lasttweets = {}
     for a in mdb.actions.aggregate(aggr):
         for t in mdb.tweets.find({ 'id':a['tweet_id']},{'_id':None, 'created_at':1 }):
-            lasttweets[a['_id']] = t['created_at']
+            lasttweets[a['_id']] = t['created_at'].replace(tzinfo=timezone.utc)
 
     return(lasttweets)
 
@@ -97,6 +98,7 @@ def getTwitterData(api):
             else:
                 action = "tweet"
             print(lasttweets.get(account,'Nope'))
+
             if action == 'tweet' and (tw['created_at']-lasttweets.get(account,datetime(2018,1,1,tzinfo=timezone.utc))).seconds>between_tweets_delay:
                 items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
             else:
