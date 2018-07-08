@@ -64,8 +64,8 @@ def getMaxId():
 
 def getTwitterData(api):
     params = {}
-    import datetime
-    import timezone
+    import datetime, timezone
+    
     lasttweets = maxs()
     for account in get_accounts_list(cache['comptes']):
         maxId = list(mdb.tweets.find({'user.screen_name': account}).sort("id",-1).limit(1))
