@@ -99,10 +99,10 @@ def getTwitterData(api):
                 action = "tweet"
             print(lasttweets.get(account,'Nope'))
 
-            if action == 'tweet' and (tw['created_at']-lasttweets.get(account,datetime(2018,1,1,tzinfo=timezone.utc))).seconds>between_tweets_delay:
-                items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
-            else:
+            if action == 'tweet' and (tw['created_at']-lasttweets.get(account,datetime(2018,1,1,tzinfo=timezone.utc))).seconds<between_tweets_delay:
                 print('skipped',tw['id'])
+            else:
+                items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
         if items:
             mdbrw.actions.insert_many(items)
     return "ok"
