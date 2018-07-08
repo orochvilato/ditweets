@@ -16,10 +16,18 @@ def twitterAccount(data):
                       sleep_on_rate_limit=True)
     return api
 
+def cvTwitterDate(date):
+    import locale
+    import datetime
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+    import pytz
+    return datetime.datetime.strptime(date,'%a %b %d %H:%M:%S +0000 %Y').replace(tzinfo=pytz.UTC)
+
 def getTweet(item):
+
     return {
         'id':item.id,
-        'created_at':item.created_at,
+        'created_at':cvTwitterDate(item.created_at),
         'user':{
             'screen_name':item.user.screen_name,
             'name':item.user.name,
