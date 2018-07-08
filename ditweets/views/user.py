@@ -259,3 +259,11 @@ def tests():
         except:
             pass
     return "ok"
+
+@app.route('/corrigedate')
+def corrige():
+    from ditweets.controllers.twitter import cvTwitterDate
+    from ditweets import mdbrw
+    for t in mdb.tweets.find({},{'created_at'}):
+        if isinstance(t['created_at'],str):
+            mdbrw.tweets.update({'_id':t['_id']},{'$set':{'created_at':cvTwitterDate(t['created_at'])}})

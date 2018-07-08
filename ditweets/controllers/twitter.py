@@ -6,6 +6,7 @@ from ditweets.tools import get_accounts_list
 
 from ditweets.controllers.tasks import q as qtwitter
 from ditweets.config_private import twitter_fetch
+from ditweets.config import between_tweets_delay
 
 def twitterAccount(data):
     import twitter
@@ -22,6 +23,25 @@ def cvTwitterDate(date):
     locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
     import pytz
     return datetime.datetime.strptime(date,'%a %b %d %H:%M:%S +0000 %Y').replace(tzinfo=pytz.UTC)
+
+def maxs():
+    aggr = [
+        {'$match': {'action':'tweet'}},
+        {'$group':
+          {
+            '_id': "$screen_name",
+            'tweet_id': { "$max": "$tweet_id" }
+          }
+        }
+    ]
+    from ditweets import mdb
+    lasttweets = {}
+    for a in mdb.actions.aggregate(aggr):
+        for t in mdb.tweets.find({ 'id':a['tweet_id']},{'_id':None, 'created_at':1 }):
+            lasttweets[a['_id']] = t['created_at']
+
+    return(lasttweets)
+
 
 def getTweet(item):
 
@@ -43,7 +63,8 @@ def getMaxId():
 
 def getTwitterData(api):
     params = {}
-
+    import datetime
+    lasttweets = maxs()
     for account in get_accounts_list(cache['comptes']):
         maxId = list(mdb.tweets.find({'user.screen_name': account}).sort("id",-1).limit(1))
 
@@ -73,8 +94,10 @@ def getTwitterData(api):
                 action = "retweet"
             else:
                 action = "tweet"
-
-            items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
+            if action == 'tweet' and (lasttweets.get(account,datetime.datetime(2018,1,1))-tw['created_at']).seconds>between_tweets_delay:
+                items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
+            else:
+                print('skipped',tw['id'])
         if items:
             mdbrw.actions.insert_many(items)
     return "ok"
