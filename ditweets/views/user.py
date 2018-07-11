@@ -207,19 +207,7 @@ def params():
 @app.route('/tops')
 @require_login(redir='tops')
 def tops():
-    ids = {}
-    suppr_ids=[]
-    for act in mdb.actions.find():
-        id = act['action']+act['screen_name']+str(act['tweet_id'])
-        if id in ids.keys():
-            suppr_ids.append(act['_id'])
-            if len(suppr_ids)==1000:
-                print('boom')
-                mdbrw.actions.remove({'_id':{'$in':suppr_ids}})
-                suppr_ids = []
-        else:
-            ids[id] = True
-    mdbrw.actions.remove({'_id':{'$in':suppr_ids}})
+    reverse = request.args.get('r',False)
     followers = {}
     for data in auth.users_data():
         followers[data['username']] = data.get('followers',0)
@@ -233,7 +221,7 @@ def tops():
     accounts = []
     for t in mdb.logs.aggregate(pipeline):
         accounts.append(dict(f=followers.get(t['_id']['user'],0),user=t['_id']['user'],n=t['n']))
-    accounts.sort(key=lambda x:x['f']*x['n'],reverse=True)
+    accounts.sort(key=lambda x:x['f']*x['n'],reverse=True if not reverse else False)
 
     html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>Followers</td><td>RT + Like</td><td>Impact</td></tr></thead><tbody>"
     for a in accounts:
@@ -285,3 +273,11 @@ def tests():
         except:
             pass
     return "ok"
+
+@app.route('/corrigedate')
+def corrige():
+    from ditweets.controllers.twitter import cvTwitterDate
+    from ditweets import mdbrw
+    for t in mdb.tweets.find({},{'created_at'}):
+        if isinstance(t['created_at'],str):
+            mdbrw.tweets.update({'_id':t['_id']},{'$set':{'created_at':cvTwitterDate(t['created_at'])}})
