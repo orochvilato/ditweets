@@ -229,7 +229,7 @@ def tops():
 
 
 
-    if 1:
+    if 0:
 
         html += "</tbody></table>"
         html += "<hr/><table border='1'><thead><tr><td>Utilisateur</td><td>RT + Like</td></tr></thead><tbody>"
