@@ -115,8 +115,7 @@ def twitter_job():
     mdbrw.actions.update_many({'tweet_id':{'$lte':maxId}},{'$set':{'done':True}})
     twitter_ids = {}
     logs = []
-    #for a in mdb.actions.find({'done':None}):
-    for a in list(mdb.actions.find())[:5]:
+    for a in mdb.actions.find({'done':None}):
         if not a['screen_name'] in twitter_ids.keys():
             twitter_ids[a['screen_name']] = {'tweets':[],'replies':[],'likes':[],'retweets':[]}
         #mdbrw.actions.update({'_id':a['_id']},{'$set':{'tweet_id':a['tweed_id']},'$unset':{'tweed_id':0}})
