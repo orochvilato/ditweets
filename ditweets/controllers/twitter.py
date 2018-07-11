@@ -109,10 +109,8 @@ def getTwitterData(api):
 
 import json
 def twitter_job():
-    maxId = mdb.logs.find().sort("tweet_id",-1).limit(1)
-    maxId = maxId[0]['tweet_id'] if maxId else 0
 
-    mdbrw.actions.update_many({'tweet_id':{'$lte':maxId}},{'$set':{'done':True}})
+
     twitter_ids = {}
     logs = []
     for a in mdb.actions.find({'done':None}):
@@ -128,6 +126,7 @@ def twitter_job():
         elif a['action']=='retweet':
             twitter_ids[a['screen_name']]['retweets'].append(a['tweet_id'])
 
+
     from random import random, randint
     for data in auth.users_data():
         if not data.get('twitter_success',False):
@@ -135,8 +134,11 @@ def twitter_job():
 
         #todo = {'rt':{},'like':{}}
         todo = {}
+        deja = {'like': set([ t['tweet_id'] for t in mdb.logs.find({'action':'like','username':data['username']},{'_id':None,'tweet_id':1})]),
+                'rt':set([ t['tweet_id'] for t in mdb.logs.find({'action':'rt','username':data['username']},{'_id':None,'tweet_id':1})])
+                }
+        
         for account in get_accounts_list(cache['comptes']):
-
             actions = {'like':[],'rt':[]}
             for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like'),('replies','rt'),('replies','like')]:
                 item = "{account}_{item}_{action}".format(account=account, item=_item, action=_action)
@@ -151,6 +153,9 @@ def twitter_job():
             for do in ['rt','like']:
                 for it in actions[do]:
                     for tweet in twitter_ids.get(account,{}).get(it,[]):
+                        if tweet in deja[do]:
+                            print(tweet)
+                            continue
                         rnd = randint(0,20)
                         if not rnd in todo.keys():
                             todo[rnd] = {'rt':{},'like':{}}
@@ -170,6 +175,7 @@ def twitter_job():
         else:
             mdbrw.queue.update_one({'_id':pa['_id']},{'$set':{'wait':pa['wait']-1}})
 
+    mdbrw.actions.update_many({},{'$set':{'done':True}})
     import json
     return json.dumps(logs)
 

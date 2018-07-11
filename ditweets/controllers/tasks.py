@@ -29,30 +29,30 @@ def dotask(userdata,todo):
     #maxId = mdb.tweets.find().sort("id",-1).limit(1)
     #maxId = maxId[0]['id'] if maxId else 0
         for id in todo['like'].keys():
-            log = {'username':userdata['username'],'action':'like','tweet_id':id}
+            log = {'username':userdata['username'],'action':'like','tweet_id':int(id)}
             #if id<=maxId:
             #    continue
             try:
                 sleep(random.random()/2)
-                api.CreateFavorite(status_id=id, include_entities=False)
+                api.CreateFavorite(status_id=int(id), include_entities=False)
                 mdbrw.logs.insert_one(log)
             except Exception as err:
                 log['error'] = err.message
-                f.write("Like %s : %s \n" % (id,err.message))
+                f.write("Like %d : %s \n" % (int(id),err.message))
 
 
 
         for id in todo['rt'].keys():
-            log = {'username':userdata['username'],'action':'rt','tweet_id':id}
+            log = {'username':userdata['username'],'action':'rt','tweet_id':int(id)}
             #if id<=maxId:
             #    continue
             try:
                 sleep(random.random()/2)
-                api.PostRetweet(status_id=id,trim_user=True)
+                api.PostRetweet(status_id=int(id),trim_user=True)
                 mdbrw.logs.insert_one(log)
             except Exception as err:
                 log['error'] = err.message
-                f.write("RT %s : %s \n" % (id,err.message))
+                f.write("RT %d : %s \n" % (int(id),err.message))
 
         f.write('---- end %s (%s) ----\n' % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), userdata.get('username','VIDE')))
 
