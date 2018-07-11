@@ -60,7 +60,7 @@ def worker(n):
 
     while True:
         item = q.get()
-        open('/tmp/ditweets.log','a').write('worker %d - %s\n' % (n,item['userdata']['username']))
+        #open('/tmp/ditweets.log','a').write('worker %d - %s\n' % (n,item['userdata']['username']))
         dotask(item)
 
         q.task_done()
