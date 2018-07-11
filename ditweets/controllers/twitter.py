@@ -159,7 +159,7 @@ def twitter_job():
 
         import json
         for rnd,td in todo.items():
-            del data['params']
+            data['params'] = {}
             mdbrw.queue.insert_one({'userdata':data,'wait':rnd,'todo':json.dumps(td)})
 
     # gestion file d'attente
