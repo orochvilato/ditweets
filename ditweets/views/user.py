@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ditweets import app, cache, mdb
+from ditweets import app, cache, mdb, mdbrw
 from ditweets.auth import require_login, auth, is_admin
 from flask import render_template, request, session, redirect
 import json
@@ -207,6 +207,19 @@ def params():
 @app.route('/tops')
 @require_login(redir='tops')
 def tops():
+    ids = {}
+    suppr_ids=[]
+    for act in mdb.actions.find():
+        id = act['action']+act['screen_name']+str(act['tweet_id'])
+        if id in ids.keys():
+            suppr_ids.append(act['_id'])
+            if len(suppr_ids)==1000:
+                print('boom')
+                mdbrw.actions.remove({'_id':{'$in':suppr_ids}})
+                suppr_ids = []
+        else:
+            ids[id] = True
+    mdbrw.actions.remove({'_id':{'$in':suppr_ids}})
     followers = {}
     for data in auth.users_data():
         followers[data['username']] = data.get('followers',0)
@@ -226,17 +239,31 @@ def tops():
     for a in accounts:
         html += "<tr><td>{user}</td><td>{f}</td><td>{n}</td><td>{i}</td></tr>".format(user=a['user'],f=a['f'],n=a['n'],i=a['f']*a['n'])
 
-    if 0:
+
+
+    if 1:
+
         html += "</tbody></table>"
         html += "<hr/><table border='1'><thead><tr><td>Utilisateur</td><td>RT + Like</td></tr></thead><tbody>"
 
         tweets = {}
-        for act in mdb.actions.find({},{'tweet_id':1,'screen_name':1,'_id':None}):
-            tweets[act['tweet_id']] = act['screen_name']
         accounts = {}
-        for log in mdb.logs.find({},{'tweet_id':1,'username':1,'_id':None}):
+        for act in mdb.actions.find({},{'tweet_id':1,'action':1,'screen_name':1,'_id':None}):
+            sn = act['screen_name']
+            tweets[act['tweet_id']] = { 'sn':act['screen_name'],'action':act['action'] }
+            if not sn in accounts.keys():
+                accounts[sn] = {'actions':{'like':{'n':0,'rt':0,'like':0},
+                                           'tweet':{'n':0,'rt':0,'like':0},
+                                           'reply':{'n':0,'rt':0,'like':0},
+                                           'retweet':{'n':0,'rt':0,'like':0}}}
+
+            accounts[sn]['actions'][act['action']]['n'] += 1
+
+        print('actions')
+
+        for log in mdb.logs.find({'error':None},{'action':1,'tweet_id':1,'username':1,'_id':None}):
             account = tweets[log['tweet_id']]
-            accounts[account] = accounts.get(account,0) + 1
+            accounts[account['sn']]['actions'][account['action']][log['action']] += 1
 
         print(accounts)
 

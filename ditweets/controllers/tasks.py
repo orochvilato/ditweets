@@ -57,11 +57,13 @@ def dotask(userdata,todo):
         f.write('---- end %s (%s) ----\n' % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), userdata.get('username','VIDE')))
 
 def worker(n):
-	while True:
-		item = q.get()
-		print('worker %d' % n,item)
-		dotask(**item)
-		q.task_done()
+
+    while True:
+        item = q.get()
+        open('/tmp/ditweets.log','a').write('worker %d - %s\n' % (n,item['userdata']['username']))
+		dotask(item)
+
+        q.task_done()
 
 
 

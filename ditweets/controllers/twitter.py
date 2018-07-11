@@ -79,7 +79,8 @@ def twitter_job():
     mdbrw.actions.update_many({'tweet_id':{'$lte':maxId}},{'$set':{'done':True}})
     twitter_ids = {}
     logs = []
-    for a in mdb.actions.find({'done':None}):
+    #for a in mdb.actions.find({'done':None}):
+    for a in list(mdb.actions.find())[:5]:
         if not a['screen_name'] in twitter_ids.keys():
             twitter_ids[a['screen_name']] = {'tweets':[],'replies':[],'likes':[],'retweets':[]}
         #mdbrw.actions.update({'_id':a['_id']},{'$set':{'tweet_id':a['tweed_id']},'$unset':{'tweed_id':0}})
@@ -92,12 +93,13 @@ def twitter_job():
         elif a['action']=='retweet':
             twitter_ids[a['screen_name']]['retweets'].append(a['tweet_id'])
 
-    from random import random
+    from random import random, randint
     for data in auth.users_data():
         if not data.get('twitter_success',False):
             continue
 
-        todo = {'rt':{},'like':{}}
+        #todo = {'rt':{},'like':{}}
+        todo = {}
         for account in get_accounts_list(cache['comptes']):
 
             actions = {'like':[],'rt':[]}
@@ -114,9 +116,24 @@ def twitter_job():
             for do in ['rt','like']:
                 for it in actions[do]:
                     for tweet in twitter_ids.get(account,{}).get(it,[]):
-                        todo[do][tweet] = 1
+                        rnd = randint(0,20)
+                        if not rnd in todo.keys():
+                            todo[rnd] = {'rt':{},'like':{}}
+                        todo[rnd][do][tweet] = 1
 
-        qtwitter.put({'userdata':data,'todo':todo})
+        import json
+        for rnd,td in todo.items():
+            del data['params']
+            mdbrw.queue.insert_one({'userdata':data,'wait':rnd,'todo':json.dumps(td)})
+
+    # gestion file d'attente
+    for pa in mdb.queue.find():
+        if pa['wait'] <= 0:
+            mdbrw.queue.remove({'_id':pa['_id']})
+            pa['todo'] = json.loads(pa['todo'])
+            qtwitter.put(pa)
+        else:
+            mdbrw.queue.update_one({'_id':pa['_id']},{'$set':{'wait':pa['wait']-1}})
 
     import json
     return json.dumps(logs)

@@ -2,7 +2,7 @@ definition = dict(
     name = __name__,
     active = True,
     type = 'cron',
-    params = dict(minute='*/30'),
+    params = dict(minute='*/7'),
     description = "Test",
     notify_error = ['observatoireapi@yahoo.com']
     )
@@ -13,7 +13,4 @@ from ditweets.config_private import twitter_fetch
 
 
 def job(**kwargs):
-    gsheet_twitter()
-    api = twitterAccount(twitter_fetch)
-    getTwitterData(api)
     twitter_job()
