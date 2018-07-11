@@ -38,7 +38,7 @@ def dotask(userdata,todo):
                 mdbrw.logs.insert_one(log)
             except Exception as err:
                 log['error'] = err.message
-                f.write("Like %d : %s \n" % (id,err.message))
+                f.write("Like %s : %s \n" % (id,err.message))
 
 
 
@@ -52,7 +52,7 @@ def dotask(userdata,todo):
                 mdbrw.logs.insert_one(log)
             except Exception as err:
                 log['error'] = err.message
-                f.write("RT %d : %s \n" % (id,err.message))
+                f.write("RT %s : %s \n" % (id,err.message))
 
         f.write('---- end %s (%s) ----\n' % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), userdata.get('username','VIDE')))
 
@@ -60,7 +60,7 @@ def worker(n):
 
     while True:
         item = q.get()
-        open('/tmp/ditweets.log','a').write('worker %d - %s\n' % (n,item['userdata']['username']))
+        #open('/tmp/ditweets.log','a').write('worker %d - %s\n' % (n,item['userdata']['username']))
         dotask(userdata=item['userdata'],todo=item['todo'])
 
         q.task_done()
