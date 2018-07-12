@@ -214,18 +214,22 @@ def tops():
 
     pgroup = {}
     pgroup['n'] = {'$sum':1}
-    pgroup['_id'] = { 'user':'$username'}
+    pgroup['_id'] = { 'user':'$username','action':'$action'}
     pipeline = [{'$match':{'error':None}},
                 {'$group':pgroup},
                 {'$sort':{'n':-1}}]
-    accounts = []
+    accounts = {}
     for t in mdb.logs.aggregate(pipeline):
-        accounts.append(dict(f=followers.get(t['_id']['user'],0),user=t['_id']['user'],n=t['n']))
-    accounts.sort(key=lambda x:x['f']*x['n'],reverse=True if not reverse else False)
+        user = t['_id']['user']
+        if not user in accounts:
+            accounts[user] = dict(user=user,f=followers.get(t['_id']['user'],0),rt=0,like=0)
+        accounts[user][t['_id']['action']] = t['n']
 
-    html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>Followers</td><td>RT + Like</td><td>Impact</td></tr></thead><tbody>"
+    accounts = sorted(accounts.values(),key=lambda x:x['f']*(x['rt']+x['like']),reverse=True if not reverse else False)
+
+    html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>Followers</td><td>RT</td><td>Like</td><td>Impact</td></tr></thead><tbody>"
     for a in accounts:
-        html += "<tr><td>{user}</td><td>{f}</td><td>{n}</td><td>{i}</td></tr>".format(user=a['user'],f=a['f'],n=a['n'],i=a['f']*a['n'])
+        html += "<tr><td>{user}</td><td>{f}</td><td>{rt}</td><td>{like}</td><td>{i}</td></tr>".format(user=a['user'],f=a['f'],rt=a['rt'],like=a['like'],i=a['f']*(a['rt']+a['like']))
 
 
 

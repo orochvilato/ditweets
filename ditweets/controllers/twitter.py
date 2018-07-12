@@ -137,7 +137,7 @@ def twitter_job():
         deja = {'like': set([ t['tweet_id'] for t in mdb.logs.find({'action':'like','username':data['username']},{'_id':None,'tweet_id':1})]),
                 'rt':set([ t['tweet_id'] for t in mdb.logs.find({'action':'rt','username':data['username']},{'_id':None,'tweet_id':1})])
                 }
-        
+
         for account in get_accounts_list(cache['comptes']):
             actions = {'like':[],'rt':[]}
             for _item,_action in [('tweets','rt'),('tweets','like'),('retweets','rt'),('retweets','like'),('likes','rt'),('likes','like'),('replies','rt'),('replies','like')]:
@@ -156,6 +156,7 @@ def twitter_job():
                         if tweet in deja[do]:
                             print(tweet)
                             continue
+                        deja[do].update([tweet])
                         rnd = randint(0,20)
                         if not rnd in todo.keys():
                             todo[rnd] = {'rt':{},'like':{}}
