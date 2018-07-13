@@ -35,7 +35,7 @@ def dotask(userdata,todo):
             try:
                 sleep(random.random()/2)
                 api.CreateFavorite(status_id=int(id), include_entities=False)
-                mdbrw.logs.insert_one(log)
+                mdbrw.logs.update_one(log,{'$set':log},upsert=True)
             except Exception as err:
                 log['error'] = err.message
                 f.write("Like %d : %s \n" % (int(id),err.message))
@@ -43,13 +43,13 @@ def dotask(userdata,todo):
 
 
         for id in todo['rt'].keys():
-            log = {'username':userdata['username'],'action':'rt','tweet_id':int(id)}
+            log = {'username':userdata['username'],'action':'rt','tweet_id':int(id),'done':True}
             #if id<=maxId:
             #    continue
             try:
                 sleep(random.random()/2)
                 api.PostRetweet(status_id=int(id),trim_user=True)
-                mdbrw.logs.insert_one(log)
+                mdbrw.logs.update_one(log,{'$set':log},upsert=True)
             except Exception as err:
                 log['error'] = err.message
                 f.write("RT %d : %s \n" % (int(id),err.message))

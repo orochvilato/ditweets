@@ -160,6 +160,7 @@ def twitter_job():
                         rnd = randint(0,20)
                         if not rnd in todo.keys():
                             todo[rnd] = {'rt':{},'like':{}}
+                        mdbrw.logs.insert_one({'username':userdata['username'],'action':do,'tweet_id':int(tweet),'done':False})
                         todo[rnd][do][tweet] = 1
 
         import json
