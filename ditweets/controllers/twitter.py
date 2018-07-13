@@ -84,8 +84,10 @@ def getTwitterData(api):
             like_ids.append(like.id)
             tweet = getTweet(like)
             mdbrw.tweets.update({'id':like.id},{'$setOnInsert':tweet},upsert=True)
-        if like_ids:
-            mdbrw.actions.insert_many([dict(screen_name=account,action='like',tweet_id=id) for id in like_ids])
+            act = dict(screen_name=account,action='like',tweet_id=like.id)
+            mdbrw.actions.update_one(act,{'$setOnInsert':act},upsert=True)
+        #if like_ids:
+        #    mdbrw.actions.update_many([dict(screen_name=account,action='like',tweet_id=id) for id in like_ids])
         items = []
         for tweet in api.GetUserTimeline(screen_name=account, **params):
             tw = getTweet(tweet)
@@ -102,9 +104,11 @@ def getTwitterData(api):
             if action == 'tweet' and (tw['created_at']-lasttweets.get(account,datetime(2018,1,1,tzinfo=timezone.utc))).seconds<between_tweets_delay:
                 print('skipped',tw['id'])
             else:
-                items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
-        if items:
-            mdbrw.actions.insert_many(items)
+                act = dict(screen_name=account,action=action,tweet_id=tweet.id)
+                mdbrw.actions.update_one(act,{'$setOnInsert':act},upsert=True)
+                #items.append(dict(screen_name=account,action=action, tweet_id=tweet.id))
+        #if items:
+        #    mdbrw.actions.insert_many(items)
     return "ok"
 
 import json
