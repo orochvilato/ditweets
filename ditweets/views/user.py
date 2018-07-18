@@ -233,31 +233,31 @@ def tops():
 
 
 
-    if 0:
-
+    if 1:
+        clean_logs()
         html += "</tbody></table>"
-        html += "<hr/><table border='1'><thead><tr><td>Utilisateur</td><td>RT + Like</td></tr></thead><tbody>"
+        html += "<hr/><table border='1'><thead><tr><td>Compte</td><td>RT</td><td>Like</td><td>Total</td></tr></thead><tbody>"
 
-        tweets = {}
+        pgroup = {}
+        pgroup['n'] = {'$sum':1}
+        pgroup['_id'] = { 'author':'$author.screen_name','action':'$action'}
+        pipeline = [{'$match':{'error':None}},
+                    {'$group':pgroup},
+                    {'$sort':{'n':-1}}]
         accounts = {}
-        for act in mdb.actions.find({},{'tweet_id':1,'action':1,'screen_name':1,'_id':None}):
-            sn = act['screen_name']
-            tweets[act['tweet_id']] = { 'sn':act['screen_name'],'action':act['action'] }
+        for t in mdb.logs.aggregate(pipeline):
+            sn = t['_id']['author']
             if not sn in accounts.keys():
-                accounts[sn] = {'actions':{'like':{'n':0,'rt':0,'like':0},
-                                           'tweet':{'n':0,'rt':0,'like':0},
-                                           'reply':{'n':0,'rt':0,'like':0},
-                                           'retweet':{'n':0,'rt':0,'like':0}}}
+                accounts[sn] = { 'author':t['_id']['author'],'rt':0,'like':0 }
+            accounts[sn][t['_id']['action']] = t['n']
 
-            accounts[sn]['actions'][act['action']]['n'] += 1
+        accounts = sorted(accounts.values(),key=lambda x:x.get('rt',0)+x.get('like',0),reverse=True)
+        for a in accounts[:20]:
+            html += '<tr><td>{user}</td><td>{rt}</td><td>{like}</td><td>{total}</td></tr>'.format(
+                user='@'+a['author'],rt=a['rt'],like=a['like'],total=a['rt']+a['like'])
 
-        print('actions')
 
-        for log in mdb.logs.find({'error':None},{'action':1,'tweet_id':1,'username':1,'_id':None}):
-            account = tweets[log['tweet_id']]
-            accounts[account['sn']]['actions'][account['action']][log['action']] += 1
 
-        print(accounts)
 
     html += "</tbody></table></body></html>"
     return html
@@ -273,7 +273,7 @@ def tests():
             api = twitterAccount(data)
             screen_name = api.GetUserTimeline(count=1)[0].user.screen_name
             followers = api.GetUser(screen_name=screen_name).followers_count
-            auth.update_data(data['username'],{'followers':followers})
+            auth.update_data(data['username'],{'followers':followers,'screenname':screen_name})
         except:
             pass
     return "ok"
@@ -285,3 +285,28 @@ def corrige():
     for t in mdb.tweets.find({},{'created_at'}):
         if isinstance(t['created_at'],str):
             mdbrw.tweets.update({'_id':t['_id']},{'$set':{'created_at':cvTwitterDate(t['created_at'])}})
+
+@app.route('/clean_logs')
+def clean_logs():
+    from ditweets import mdbrw
+    if 0:
+        prec = []
+        for t in mdb.logs.find({}).sort([('username',1),('tweet_id',1),('action',1)]):
+            cur = [t['username'],t['tweet_id'],t['action']]
+            if cur == prec:
+                mdbrw.logs.remove({'_id':t['_id']})
+            prec = cur
+    tdict = {}
+    for l in mdb.logs.find({'author':None},{'tweet_id':1}):
+        if not l['tweet_id'] in tdict.keys():
+            tdict[l['tweet_id']] = []
+        if not l['_id'] in tdict[l['tweet_id']]:
+            tdict[l['tweet_id']].append(l['_id'])
+
+    upd = []
+    from pymongo import UpdateOne
+    for t in mdb.tweets.find({'id':{'$in':list(tdict.keys())}},{'id':1,'user':1}):
+        for l_id in tdict[t['id']]:
+            upd.append(UpdateOne({'_id':l_id},{'$set':{'author':t['user']}}))
+    if upd:
+        mdbrw.logs.bulk_write(upd)
