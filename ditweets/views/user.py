@@ -236,7 +236,7 @@ def tops():
     if 1:
         clean_logs()
         html += "</tbody></table>"
-        html += "<hr/><table border='1'><thead><tr><td>Compte</td><td>RT</td><td>Like</td><td>Total</td></tr></thead><tbody>"
+        html += "<hr/><table border='1'><thead><tr><td>#</td><td>Compte</td><td>RT</td><td>Like</td><td>Total</td></tr></thead><tbody>"
 
         pgroup = {}
         pgroup['n'] = {'$sum':1}
@@ -252,9 +252,9 @@ def tops():
             accounts[sn][t['_id']['action']] = t['n']
 
         accounts = sorted(accounts.values(),key=lambda x:x.get('rt',0)+x.get('like',0),reverse=True)
-        for a in accounts[:20]:
-            html += '<tr><td>{user}</td><td>{rt}</td><td>{like}</td><td>{total}</td></tr>'.format(
-                user='@'+a['author'],rt=a['rt'],like=a['like'],total=a['rt']+a['like'])
+        for i,a in enumerate(accounts[:100]):
+            html += '<tr><td>{i}</td><td>{user}</td><td>{rt}</td><td>{like}</td><td>{total}</td></tr>'.format(
+                user='@'+a['author'],i=i+1,rt=a['rt'],like=a['like'],total=a['rt']+a['like'])
 
 
 
