@@ -103,6 +103,7 @@ def getTwitterData(api):
 
             if action == 'tweet' and (tw['created_at']-lasttweets.get(account,datetime(2018,1,1,tzinfo=timezone.utc))).seconds<between_tweets_delay:
                 print('skipped',tw['id'])
+                lasttweets[account] = tw['created_at']
             else:
                 act = dict(screen_name=account,action=action,tweet_id=tweet.id)
                 mdbrw.actions.update_one(act,{'$setOnInsert':act},upsert=True)
