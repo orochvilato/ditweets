@@ -225,11 +225,11 @@ def tops():
             accounts[user] = dict(user=user,f=followers.get(t['_id']['user'],0),rt=0,like=0)
         accounts[user][t['_id']['action']] = t['n']
 
-    accounts = sorted(accounts.values(),key=lambda x:x['f']*(x['rt']+x['like']),reverse=True if not reverse else False)
+    accounts = sorted(accounts.values(),key=lambda x:x['f']*x['rt'],reverse=True if not reverse else False)
 
     html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>Followers</td><td>RT</td><td>Like</td><td>Impact</td></tr></thead><tbody>"
     for a in accounts:
-        html += "<tr><td>{user}</td><td>{f}</td><td>{rt}</td><td>{like}</td><td>{i}</td></tr>".format(user=a['user'],f=a['f'],rt=a['rt'],like=a['like'],i=a['f']*(a['rt']+a['like']))
+        html += "<tr><td>{user}</td><td>{f}</td><td>{rt}</td><td>{like}</td><td>{i}</td></tr>".format(user=a['user'],f=a['f'],rt=a['rt'],like=a['like'],i=a['f']*a['rt'])
 
 
 
