@@ -227,9 +227,9 @@ def tops():
 
     accounts = sorted(accounts.values(),key=lambda x:x['f']*x['rt'],reverse=True if not reverse else False)
 
-    html = "<html><body><table border='1'><thead><tr><td>Utilisateur</td><td>Followers</td><td>RT</td><td>Like</td><td>Impact</td></tr></thead><tbody>"
-    for a in accounts:
-        html += "<tr><td>{user}</td><td>{f}</td><td>{rt}</td><td>{like}</td><td>{i}</td></tr>".format(user=a['user'],f=a['f'],rt=a['rt'],like=a['like'],i=a['f']*a['rt'])
+    html = "<html><body><table border='1'><thead><tr><td>#</td><td>Utilisateur</td><td>Followers</td><td>RT</td><td>Like</td><td>Impact</td></tr></thead><tbody>"
+    for i,a in enumerate(accounts):
+        html += "<tr><td>{i}</td><td>{user}</td><td>{f}</td><td>{rt}</td><td>{like}</td><td>{i}</td></tr>".format(i=i+1,user=a['user'],f=a['f'],rt=a['rt'],like=a['like'],i=a['f']*a['rt'])
 
 
 
