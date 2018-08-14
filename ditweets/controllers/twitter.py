@@ -153,6 +153,12 @@ def twitter_job():
                         val = float(val)
                     except:
                         val = 0
+                    if _action=='like':
+                        if not account in cache['comptes'].get('Discord','nope'):
+                            val = 0
+                        else:
+                            val = max(val,30)
+
                     if (val/100+random())>=1:
                         actions[_action] = actions.get(_action,[]) + [ _item ]
             for do in ['rt','like']:
