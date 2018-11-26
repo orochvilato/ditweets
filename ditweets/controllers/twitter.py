@@ -78,7 +78,11 @@ def getTwitterData(api):
             params = {'count': 10}
 
         # likes
-        likes = api.GetFavorites(screen_name=account, **params)
+        try:
+            likes = api.GetFavorites(screen_name=account, **params)
+        except:
+            print('erreur Like %s' % account)
+            likes = []
         like_ids = []
         for like in likes:
             like_ids.append(like.id)
@@ -89,7 +93,12 @@ def getTwitterData(api):
         #if like_ids:
         #    mdbrw.actions.update_many([dict(screen_name=account,action='like',tweet_id=id) for id in like_ids])
         items = []
-        for tweet in api.GetUserTimeline(screen_name=account, **params):
+        try:
+            tweets = api.GetUserTimeline(screen_name=account, **params):
+        except:
+            print('erreur Tweets %s' % account)
+            tweets = []
+        for tweet in tweets:
             tw = getTweet(tweet)
             print(account,tw)
             mdbrw.tweets.update({'id':tweet.id},{'$setOnInsert':tw}, upsert=True)
